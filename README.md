@@ -20,7 +20,7 @@ Contoh notifikasi yang dicatat:
 
 ## Pasang di HP
 
-1. Unduh dari HP: **https://github.com/Harrakyy/SetorPantau/releases/download/latest/SetorPantau-latest-debug.apk**
+1. Unduh dari HP: **https://github.com/Harrakyy/setorpantau/releases/download/latest/SetorPantau-latest-debug.apk**
 2. Buka file APK-nya, izinkan **"Instal aplikasi tidak dikenal"**, lalu **Instal**.
 3. Buka SetorPantau → **Pengaturan → Buka pengaturan izin** → aktifkan **SetorPantau** di Akses Notifikasi.
 4. Matikan penghemat baterai: **Setelan → Aplikasi → SetorPantau → Baterai → Tidak dibatasi**. Tanpa ini, Android bisa menghentikan pembaca notifikasi diam-diam.
