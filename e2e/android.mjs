@@ -1,4 +1,4 @@
-// Skenario E2E SetorPantau di emulator: notif sungguhan dikirim ke Android, lalu dicek tercatat di aplikasi.
+// Skenario E2E Setor di emulator: notif sungguhan dikirim ke Android, lalu dicek tercatat di aplikasi.
 import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 
@@ -117,7 +117,7 @@ try {
   })()`);
   check(edit?.chip === "Booking R5Y2", "Label transaksi tersimpan", JSON.stringify(edit));
   const cache = adb(`shell run-as ${APP} ls cache`);
-  check(/SetorPantau-.*\.csv/.test(cache), "File CSV ekspor dibuat", cache);
+  check(/Setor-.*\.csv/.test(cache), "File CSV ekspor dibuat", cache);
   const focus = adb("shell dumpsys window").split("\n").filter((l) => /mCurrentFocus|mFocusedApp/.test(l)).join(" | ");
   check(/chooser|intentresolver|ResolverActivity|ChooserActivity/i.test(focus), "Lembar Bagikan Android terbuka untuk CSV", focus);
 } catch (err) {

@@ -21,8 +21,8 @@ Contoh notifikasi yang dicatat:
 
 ## Pasang di HP
 
-1. Unduh APK terbaru dari HP: **https://github.com/Harrakyy/Setor/releases/download/latest/SetorPantau-latest-debug.apk**
-   - Atau buka halaman rilis **https://github.com/Harrakyy/Setor/releases/tag/latest** lalu ketuk **SetorPantau-latest-debug.apk**.
+1. Unduh APK terbaru dari HP: **https://github.com/Harrakyy/Setor/releases/download/latest/Setor-latest-debug.apk**
+   - Atau buka halaman rilis **https://github.com/Harrakyy/Setor/releases/tag/latest** lalu ketuk **Setor-latest-debug.apk**.
    - APK ini dibuat otomatis oleh GitHub Actions setiap ada push ke `main` (tab **Actions → Android APK**), jadi selalu versi terbaru.
    - Link 404? Repo masih privat: ubah di **Settings → General → Danger Zone → Change visibility → Public**, atau unduh sambil login GitHub.
 2. Buka file APK-nya, izinkan **"Instal aplikasi tidak dikenal"**, lalu **Instal**. Kalau sudah ada versi lama dengan tanda tangan berbeda, hapus dulu versi lamanya.

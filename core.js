@@ -1,4 +1,4 @@
-// Logika murni SetorPantau: tanpa dependensi, tanpa akses perangkat, supaya bisa dites dengan node --test.
+// Logika murni Setor: tanpa dependensi, tanpa akses perangkat, supaya bisa dites dengan node --test.
 // Semua fungsi mengembalikan nilai baru; list transaksi tidak pernah diubah langsung.
 
 // Contoh notifikasi DANA: judul "Pembayaran Masuk", teks "Rp1.000 diterima DANA Bisnis."

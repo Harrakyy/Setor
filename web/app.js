@@ -221,7 +221,7 @@ function renderPermission() {
     return;
   }
   status.className = listening ? "notice ok" : "notice warn";
-  status.textContent = listening ? "Aktif — notifikasi DANA sedang dipantau." : "Belum aktif — SetorPantau belum bisa membaca notifikasi.";
+  status.textContent = listening ? "Aktif — notifikasi DANA sedang dipantau." : "Belum aktif — Setor belum bisa membaca notifikasi.";
   warn.classList.toggle("hidden", listening);
   if (!listening) {
     warn.innerHTML = "<b>Akses Notifikasi belum aktif</b>Pembayaran DANA belum bisa dicatat sampai izin diaktifkan.";
@@ -277,7 +277,7 @@ $("detailDelete").addEventListener("click", async () => {
 // ---------- ekspor ----------
 async function exportCsv(list) {
   if (!list.length) return toast("Belum ada transaksi untuk diekspor.");
-  const name = `SetorPantau-${wibDate(Date.now())}.csv`;
+  const name = `Setor-${wibDate(Date.now())}.csv`;
   const csv = toCsv(list);
   try {
     if (isNative) {
