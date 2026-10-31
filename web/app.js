@@ -74,24 +74,19 @@ async function refreshPermission() {
 }
 
 // ---------- tampilan ----------
-const icoCal = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>';
-const icoMore = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
-
-// Kartu bertint: nominal, catatan, chip label, dan tanggal di kanan
+// Kartu bertint 2 baris: nominal + waktu, lalu chip label + catatan
 function txRow(t) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "tx";
   btn.dataset.id = t.id;
-  btn.innerHTML = `<span class="amt"></span><span class="note"></span><span class="foot"><span class="chips"></span><span class="when">${icoCal}<span></span></span></span><span class="more" aria-hidden="true">${icoMore}</span>`;
+  btn.innerHTML = `<span class="top"><span class="amt"></span><span class="when"></span></span><span class="sub"></span>`;
   btn.querySelector(".amt").textContent = rupiah(t.amount);
-  const note = btn.querySelector(".note");
-  if (t.note) note.textContent = t.note;
-  else note.remove();
-  const chips = btn.querySelector(".chips");
-  chips.append(Object.assign(document.createElement("span"), { className: "chip", textContent: "DANA" }));
-  if (t.label) chips.append(Object.assign(document.createElement("span"), { className: "chip", textContent: t.label }));
-  btn.querySelector(".when span").textContent = fmtShort(t.time);
+  btn.querySelector(".when").textContent = fmtShort(t.time);
+  const sub = btn.querySelector(".sub");
+  sub.append(Object.assign(document.createElement("span"), { className: "chip", textContent: "DANA" }));
+  if (t.label) sub.append(Object.assign(document.createElement("span"), { className: "chip", textContent: t.label }));
+  if (t.note) sub.append(Object.assign(document.createElement("span"), { className: "note", textContent: t.note }));
   btn.setAttribute("aria-label", `${rupiah(t.amount)}, ${fmtWhen(t.time)}${t.label ? ", " + t.label : ""}${t.note ? ", " + t.note : ""}`);
   btn.addEventListener("click", () => openDetail(t.id));
   return btn;

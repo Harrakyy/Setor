@@ -23,68 +23,71 @@
     :focus-visible { outline: 3px solid var(--magenta); outline-offset: 2px; }
     svg { flex: none; }
 
-    main { max-width: 560px; margin: 0 auto; padding: calc(18px + env(safe-area-inset-top)) 18px calc(118px + env(safe-area-inset-bottom)); }
-    section { display: flex; flex-direction: column; gap: 16px; }
+    main { max-width: 560px; margin: 0 auto; padding: calc(12px + env(safe-area-inset-top)) 14px calc(92px + env(safe-area-inset-bottom)); }
+    section { display: flex; flex-direction: column; gap: 10px; }
 
     /* Judul halaman di tengah dengan tombol bulat di kanan (seperti "Create Note") */
-    .topbar { display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; gap: 8px; }
-    .topbar h1 { margin: 0; text-align: center; font-size: 22px; font-weight: 600; color: var(--brand-dark); }
-    .round { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--card); box-shadow: var(--shadow); display: grid; place-items: center; cursor: pointer; color: var(--brand-dark); }
-    .round svg { width: 20px; height: 20px; }
+    .topbar { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; gap: 8px; }
+    .topbar h1 { margin: 0; text-align: center; font-size: 18px; font-weight: 600; color: var(--brand-dark); }
+    .round { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--card); box-shadow: var(--shadow); display: grid; place-items: center; cursor: pointer; color: var(--brand-dark); }
+    .round svg { width: 18px; height: 18px; }
 
     /* Tile berikon */
-    .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .tile { background: var(--card); border-radius: 24px; padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; min-height: 150px; }
-    .tile .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: #f1f3f8; color: var(--brand-dark); margin-bottom: 10px; }
-    .tile .ico svg { width: 20px; height: 20px; }
-    .tile span { font-size: 13px; font-weight: 600; color: var(--muted); }
-    .tile b { font-size: 21px; font-weight: 700; line-height: 1.2; word-break: break-word; }
-    .tile small { font-size: 12px; color: var(--muted); }
-    .tile.hero { background: var(--brand); color: #fff; transform: rotate(-3deg); box-shadow: 0 14px 30px rgba(28, 41, 85, .28); }
+    .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tile { background: var(--card); border-radius: 18px; padding: 12px 14px; box-shadow: var(--shadow); display: grid; grid-template-columns: 30px 1fr; column-gap: 8px; align-items: center; }
+    .tile .ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: #f1f3f8; color: var(--brand-dark); }
+    .tile .ico svg { width: 16px; height: 16px; }
+    .tile span { font-size: 12px; font-weight: 600; color: var(--muted); }
+    .tile b { grid-column: 1 / -1; margin-top: 8px; font-size: 18px; font-weight: 700; line-height: 1.2; word-break: break-word; }
+    .tile small { grid-column: 1 / -1; font-size: 11px; color: var(--muted); }
+    .tile.hero { background: var(--brand); color: #fff; transform: rotate(-2deg); box-shadow: 0 8px 18px rgba(28, 41, 85, .25); }
     .tile.hero .ico { background: rgba(255, 255, 255, .95); color: var(--brand); }
     .tile.hero span, .tile.hero small { color: rgba(255, 255, 255, .78); }
 
-    h2 { margin: 6px 2px 0; font-size: 20px; font-weight: 500; color: var(--brand-dark); }
+    h2 { margin: 4px 2px 0; font-size: 15px; font-weight: 600; color: var(--brand-dark); }
 
     /* Kartu transaksi bertint seperti "Recent Notes" */
-    .list { display: flex; flex-direction: column; gap: 12px; }
-    .tx { position: relative; display: block; width: 100%; text-align: left; border: 0; cursor: pointer; border-radius: 22px; padding: 16px 56px 16px 18px; background: var(--tint-blue); box-shadow: 0 1px 2px rgba(17, 26, 56, .04); }
+    .list { display: flex; flex-direction: column; gap: 8px; }
+    .tx { display: block; width: 100%; text-align: left; border: 0; cursor: pointer; border-radius: 16px; padding: 10px 14px; background: var(--tint-blue); }
     .list .tx:nth-child(3n+2) { background: var(--tint-green); }
     .list .tx:nth-child(3n+3) { background: var(--tint-amber); }
-    .tx .amt { display: block; font-size: 18px; font-weight: 600; color: var(--brand-dark); }
-    .tx .note { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tx .foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; }
-    .tx .chips { display: flex; gap: 6px; flex-wrap: wrap; min-width: 0; }
-    .chip { font-size: 12px; font-weight: 500; color: var(--brand-dark); background: #fff; border-radius: 999px; padding: 3px 12px; white-space: nowrap; }
-    .tx .when { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); white-space: nowrap; }
-    .tx .when svg { width: 13px; height: 13px; }
-    .tx .more { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; border-radius: 50%; background: #fff; display: grid; place-items: center; color: var(--brand-dark); }
-    .tx .more svg { width: 16px; height: 16px; }
-    .empty { text-align: center; color: var(--muted); font-size: 13px; padding: 28px 12px; background: var(--card); border-radius: 22px; box-shadow: var(--shadow); }
+    .tx .top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .tx .amt { font-size: 16px; font-weight: 600; color: var(--brand-dark); }
+    .tx .when { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .tx .sub { display: flex; align-items: center; gap: 6px; margin-top: 4px; min-width: 0; }
+    .chip { font-size: 11px; font-weight: 500; color: var(--brand-dark); background: #fff; border-radius: 999px; padding: 1px 9px; white-space: nowrap; }
+    .tx .note { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .empty { text-align: center; color: var(--muted); font-size: 13px; padding: 20px 12px; background: var(--card); border-radius: 16px; box-shadow: var(--shadow); }
 
     /* Kartu & form */
-    .card { background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
-    .card h3 { margin: 0; font-size: 16px; font-weight: 600; color: var(--brand-dark); }
+    .card { background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .card h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--brand-dark); }
     .card p { margin: 0; font-size: 13px; color: var(--muted); }
-    .search { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 999px; padding: 0 18px; min-height: 52px; box-shadow: var(--shadow); }
+    .search { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 999px; padding: 0 16px; min-height: 44px; box-shadow: var(--shadow); }
     .search svg { width: 18px; height: 18px; color: var(--muted); }
-    .search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 12px 0; }
+    .search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 10px 0; font-size: 14px; }
     .field { display: flex; flex-direction: column; gap: 6px; }
     .field label { font-size: 12px; font-weight: 600; color: var(--muted); padding-left: 4px; }
-    .input { width: 100%; min-height: 48px; border: 1px solid #e3e6ef; border-radius: 16px; padding: 10px 14px; background: #fff; }
+    .input { width: 100%; min-height: 44px; border: 1px solid #e3e6ef; border-radius: 12px; padding: 8px 12px; background: #fff; }
     textarea.input { min-height: 96px; resize: vertical; }
     .row { display: flex; gap: 10px; flex-wrap: wrap; }
     .row > * { flex: 1 1 130px; }
     .pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--card); box-shadow: var(--shadow); font-size: 13px; font-weight: 600; cursor: pointer; color: var(--brand-dark); }
     .pill svg { width: 15px; height: 15px; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 16px; border: 0; background: #f1f3f8; font-weight: 600; cursor: pointer; color: var(--brand-dark); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: #f1f3f8; font-weight: 600; cursor: pointer; color: var(--brand-dark); }
     .btn.primary { background: var(--brand); color: #fff; }
     .btn.danger { background: #fdecec; color: var(--danger); }
     .btn:disabled { opacity: .5; cursor: not-allowed; }
+    details.filter { background: var(--card); border-radius: 18px; box-shadow: var(--shadow); }
+    details.filter summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; min-height: 44px; font-size: 13px; font-weight: 600; color: var(--brand-dark); }
+    details.filter summary::-webkit-details-marker { display: none; }
+    details.filter summary::after { content: "\25BE"; color: var(--muted); }
+    details.filter[open] summary::after { content: "\25B4"; }
+    details.filter .body { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 10px; }
     .summary { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); padding: 0 6px; }
     .summary b { color: var(--brand-dark); }
 
-    .notice { border-radius: 20px; padding: 14px 16px; font-size: 13px; display: flex; flex-direction: column; gap: 10px; }
+    .notice { border-radius: 16px; padding: 12px 14px; font-size: 13px; display: flex; flex-direction: column; gap: 10px; }
     .notice.warn { background: #fff7e6; color: var(--warn); }
     .notice.ok { background: var(--tint-green); color: var(--success); }
     .notice b { font-size: 14px; }
@@ -92,10 +95,10 @@
     ol.steps li { margin: 4px 0; }
 
     /* Navigasi pill gelap mengambang */
-    .dock { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 30; background: var(--brand-dark); border-radius: 999px; padding: 8px; box-shadow: 0 12px 30px rgba(17, 26, 56, .35); }
-    .tabs { display: flex; gap: 10px; }
-    .tab { width: 56px; height: 56px; border-radius: 50%; border: 0; background: #fff; color: var(--brand-dark); display: grid; place-items: center; cursor: pointer; }
-    .tab svg { width: 22px; height: 22px; }
+    .dock { position: fixed; left: 50%; bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 30; background: var(--brand-dark); border-radius: 999px; padding: 6px; box-shadow: 0 12px 30px rgba(17, 26, 56, .35); }
+    .tabs { display: flex; gap: 6px; }
+    .tab { width: 46px; height: 46px; border-radius: 50%; border: 0; background: #fff; color: var(--brand-dark); display: grid; place-items: center; cursor: pointer; }
+    .tab svg { width: 20px; height: 20px; }
     .tab[aria-selected="true"] { background: #4f6bd8; color: #fff; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -104,7 +107,7 @@
     .sheet { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
     .sheet .big { font-size: 28px; font-weight: 700; color: var(--brand-dark); }
     .sheet .raw { font-size: 13px; color: var(--muted); background: #fff; border-radius: 16px; padding: 10px 12px; }
-    .toast { position: fixed; left: 50%; bottom: calc(100px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--brand-dark); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); z-index: 50; max-width: calc(100% - 32px); }
+    .toast { position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--brand-dark); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); z-index: 50; max-width: calc(100% - 32px); }
   </style>
 </head>
 <body>
@@ -143,13 +146,16 @@
         <span class="sr-only">Cari transaksi</span>
         <input id="q" type="search" inputmode="search" placeholder="Cari nominal, label, catatan…" autocomplete="off">
       </label>
-      <div class="card">
-        <div class="row">
-          <div class="field"><label for="from">Dari tanggal</label><input id="from" class="input" type="date"></div>
-          <div class="field"><label for="to">Sampai tanggal</label><input id="to" class="input" type="date"></div>
+      <details class="filter">
+        <summary>Filter tanggal</summary>
+        <div class="body">
+          <div class="row">
+            <div class="field"><label for="from">Dari</label><input id="from" class="input" type="date"></div>
+            <div class="field"><label for="to">Sampai</label><input id="to" class="input" type="date"></div>
+          </div>
+          <button id="resetFilter" class="pill" type="button" style="align-self:flex-start">Reset filter</button>
         </div>
-        <button id="resetFilter" class="pill" type="button" style="align-self:flex-start">Reset filter</button>
-      </div>
+      </details>
       <div class="summary"><span id="filterCount">0 transaksi</span><span>Total <b id="filterSum">Rp 0</b></span></div>
       <div id="txList" class="list"></div>
     </section>
