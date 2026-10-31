@@ -55,6 +55,9 @@
     .tx .amt { font-size: 16px; font-weight: 600; color: var(--brand-dark); }
     .tx .when { font-size: 12px; color: var(--muted); white-space: nowrap; }
     .tx .sub { display: flex; align-items: center; gap: 6px; margin-top: 4px; min-width: 0; }
+    .chip.ok { background: #dcf3e4; color: var(--success); }
+    .chip.warn { background: #fdecc8; color: var(--warn); }
+    .chip.muted { background: #eceef3; color: var(--muted); }
     .chip { font-size: 11px; font-weight: 500; color: var(--brand-dark); background: #fff; border-radius: 999px; padding: 1px 9px; white-space: nowrap; }
     .tx .note { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
     .empty { text-align: center; color: var(--muted); font-size: 13px; padding: 20px 12px; background: var(--card); border-radius: 16px; box-shadow: var(--shadow); }
@@ -174,6 +177,23 @@
         </ol>
       </div>
       <div class="card">
+        <h3>Hubungkan ke web</h3>
+        <p>Pembayaran yang tercatat otomatis dikirim ke web reservasi (Atmosphere), lalu pesanan dengan nominal yang cocok langsung jadi <b>Lunas</b>.</p>
+        <div id="connForm" style="display:flex;flex-direction:column;gap:10px">
+          <div class="field"><label for="connUrl">Alamat web</label><input id="connUrl" class="input" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://atmosphere-jb5u.vercel.app"></div>
+          <div class="field"><label for="connCode">Kode pairing (dari Admin → Pengaturan → Hubungkan HP kasir)</label><input id="connCode" class="input" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="8 karakter"></div>
+          <div class="field"><label for="connName">Nama HP ini</label><input id="connName" class="input" maxlength="40" value="HP Kasir"></div>
+          <button id="connPair" class="btn primary" type="button">Hubungkan</button>
+        </div>
+        <div id="connInfo" class="hidden" style="display:flex;flex-direction:column;gap:10px">
+          <div id="connStatus" class="notice ok"></div>
+          <div class="row">
+            <button id="connRetry" class="btn" type="button">Kirim ulang sekarang</button>
+            <button id="connDisconnect" class="btn danger" type="button">Putuskan</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
         <h3>Sumber notifikasi</h3>
         <div class="field">
           <label for="packages">Paket aplikasi (pisahkan dengan koma)</label>
@@ -205,6 +225,7 @@
         <div style="font-size:13px;color:var(--muted)" id="detailTime"></div>
       </div>
       <div class="raw" id="detailRaw"></div>
+      <div class="raw hidden" id="detailSync"></div>
       <div class="field"><label for="detailLabel">Label</label><input id="detailLabel" class="input" maxlength="60" placeholder="Contoh: Booking R5Y2"></div>
       <div class="field"><label for="detailNote">Catatan</label><textarea id="detailNote" class="input" maxlength="300" placeholder="Contoh: Budi, rombongan 8 orang"></textarea></div>
       <div class="row">

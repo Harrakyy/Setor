@@ -1,13 +1,15 @@
-import { Capacitor } from "@capacitor/core";
+import { Capacitor, CapacitorHttp } from "@capacitor/core";
 import { Preferences } from "@capacitor/preferences";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import { NotificationsListener } from "capacitor-notifications-listener";
 import { parseNotification, addTx, updateTx, deleteTx, totals, filterTx, toCsv, wibDate } from "../core.js";
+import { pendingTx, syncAll, mergeSynced, normalizeServerUrl } from "../sync.js";
 
 const isNative = Capacitor.isNativePlatform();
 const KEY_TX = "setorpantau.tx";
 const KEY_PKGS = "setorpantau.packages";
+const KEY_CONN = "setorpantau.conn"; // { url, token, deviceName, pairedAt }
 const DEFAULT_PKGS = ["id.dana"];
 
 const $ = (id) => document.getElementById(id);
@@ -23,16 +25,20 @@ let txs = [];
 let packages = DEFAULT_PKGS;
 let editingId = null;
 let listening = false;
+let conn = null;
+let syncing = false;
 
 // ---------- penyimpanan ----------
 async function load() {
   try {
-    const [{ value: rawTx }, { value: rawPkgs }] = await Promise.all([
+    const [{ value: rawTx }, { value: rawPkgs }, { value: rawConn }] = await Promise.all([
       Preferences.get({ key: KEY_TX }),
       Preferences.get({ key: KEY_PKGS }),
+      Preferences.get({ key: KEY_CONN }),
     ]);
     txs = rawTx ? JSON.parse(rawTx) : [];
     packages = rawPkgs ? JSON.parse(rawPkgs) : DEFAULT_PKGS;
+    conn = rawConn ? JSON.parse(rawConn) : null;
   } catch {
     txs = [];
     packages = DEFAULT_PKGS;
@@ -52,6 +58,92 @@ async function onNotification(n) {
   await saveTxs();
   render();
   toast(`${rupiah(tx.amount)} masuk tercatat`);
+  syncNow();
+}
+
+// ---------- sinkron ke web Atmosphere (K-35) ----------
+// Di APK pakai HTTP native (tanpa CORS); di pratinjau browser pakai fetch biasa
+async function postJson(url, body, token) {
+  const headers = { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+  if (isNative) {
+    const r = await CapacitorHttp.post({ url, headers, data: body });
+    let data = r.data;
+    if (typeof data === "string") { try { data = JSON.parse(data); } catch { data = null; } }
+    return { status: r.status, data };
+  }
+  const r = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+  return { status: r.status, data: await r.json().catch(() => null) };
+}
+
+async function syncNow() {
+  if (!conn || syncing || !pendingTx(txs, conn).length) return;
+  syncing = true;
+  try {
+    const { list, revoked } = await syncAll(txs, conn, (payload) =>
+      postJson(`${conn.url}/api/payments/qris/notification`, payload, conn.token)
+    );
+    txs = mergeSynced(txs, list);
+    await saveTxs();
+    if (revoked) {
+      conn = null;
+      await Preferences.remove({ key: KEY_CONN });
+      toast("Akses ke web dicabut admin. Hubungkan ulang dari Pengaturan.");
+    }
+    render();
+    renderConn();
+  } finally {
+    syncing = false;
+  }
+}
+
+async function pair() {
+  let url;
+  try {
+    url = normalizeServerUrl($("connUrl").value);
+  } catch {
+    return toast("Alamat web tidak valid. Contoh: https://atmosphere-jb5u.vercel.app");
+  }
+  const code = $("connCode").value.trim().toUpperCase();
+  if (code.length < 8) return toast("Isi kode pairing 8 karakter dari halaman admin.");
+  $("connPair").disabled = true;
+  try {
+    const res = await postJson(`${url}/api/devices/pair`, { code, name: $("connName").value.trim() || "HP Kasir" });
+    if (!res.data?.success) return toast(res.data?.error?.message || "Gagal menghubungkan. Cek alamat web.");
+    conn = { url, token: res.data.data.token, deviceName: res.data.data.device.name, pairedAt: Date.now() };
+    await Preferences.set({ key: KEY_CONN, value: JSON.stringify(conn) });
+    $("connCode").value = "";
+    toast("Terhubung ke web");
+    renderConn();
+    syncNow();
+  } catch {
+    toast("Web tidak bisa dihubungi. Cek internet dan alamat web.");
+  } finally {
+    $("connPair").disabled = false;
+  }
+}
+
+function renderConn() {
+  $("connForm").classList.toggle("hidden", !!conn);
+  $("connInfo").classList.toggle("hidden", !conn);
+  if (!conn) return;
+  const queued = pendingTx(txs, conn).length;
+  $("connStatus").className = queued ? "notice warn" : "notice ok";
+  $("connStatus").textContent =
+    `Terhubung ke ${new URL(conn.url).host} sebagai "${conn.deviceName}". ` +
+    (queued ? `${queued} pembayaran menunggu terkirim.` : "Semua pembayaran sudah terkirim.");
+}
+
+const SYNC_CHIP = {
+  MATCHED: ["Lunas", "ok"],
+  ALREADY_PAID: ["Sudah lunas", "muted"],
+  LATE_SLOT_TAKEN: ["Telat · refund", "warn"],
+  NO_MATCH: ["Tak ada pesanan", "warn"],
+};
+function syncChip(t) {
+  if (t.sync?.state === "sent") return SYNC_CHIP[t.sync.result] ?? ["Terkirim", "muted"];
+  if (t.sync?.state === "failed") return ["Gagal kirim", "warn"];
+  if (conn && pendingTx([t], conn).length) return ["Antri", "warn"];
+  return null;
 }
 
 async function startListener() {
@@ -86,6 +178,8 @@ function txRow(t) {
   const sub = btn.querySelector(".sub");
   sub.append(Object.assign(document.createElement("span"), { className: "chip", textContent: "DANA" }));
   if (t.label) sub.append(Object.assign(document.createElement("span"), { className: "chip", textContent: t.label }));
+  const sc = syncChip(t);
+  if (sc) sub.append(Object.assign(document.createElement("span"), { className: `chip ${sc[1]}`, textContent: sc[0] }));
   if (t.note) sub.append(Object.assign(document.createElement("span"), { className: "note", textContent: t.note }));
   btn.setAttribute("aria-label", `${rupiah(t.amount)}, ${fmtWhen(t.time)}${t.label ? ", " + t.label : ""}${t.note ? ", " + t.note : ""}`);
   btn.addEventListener("click", () => openDetail(t.id));
@@ -150,6 +244,9 @@ function openDetail(id) {
   $("detailAmount").textContent = rupiah(t.amount);
   $("detailTime").textContent = fmtWhen(t.time);
   $("detailRaw").textContent = `${t.title ? t.title + " — " : ""}${t.text}`;
+  const sc = syncChip(t);
+  $("detailSync").classList.toggle("hidden", !sc);
+  if (sc) $("detailSync").textContent = `Web: ${sc[0]}${t.sync?.code ? " · reservasi " + t.sync.code : ""}${t.sync?.error ? " · " + t.sync.error : ""}`;
   $("detailLabel").value = t.label;
   $("detailNote").value = t.note;
   $("detail").showModal();
@@ -230,6 +327,20 @@ $("resetFilter").addEventListener("click", () => {
 $("exportCsv").addEventListener("click", () => exportCsv(filterTx(txs, currentFilter())));
 $("exportCsv2").addEventListener("click", () => exportCsv(txs));
 $("grant").addEventListener("click", requestPermission);
+$("connPair").addEventListener("click", pair);
+$("connRetry").addEventListener("click", async () => {
+  // Gagal kirim permanen dibuka lagi supaya bisa dicoba ulang manual
+  txs = txs.map((t) => (t.sync?.state === "failed" ? { ...t, sync: undefined } : t));
+  await syncNow();
+  if (!conn || !pendingTx(txs, conn).length) toast("Tidak ada yang perlu dikirim.");
+});
+$("connDisconnect").addEventListener("click", async () => {
+  if (!confirm("Putuskan HP ini dari web? Pembayaran tidak lagi dikirim otomatis.")) return;
+  conn = null;
+  await Preferences.remove({ key: KEY_CONN });
+  renderConn();
+  render();
+});
 
 // Pratinjau browser: tiru notifikasi DANA supaya seluruh alur bisa dicoba tanpa HP
 $("simulate").addEventListener("click", () =>
@@ -246,7 +357,11 @@ document.addEventListener("visibilitychange", async () => {
   if (document.visibilityState !== "visible" || !isNative) return;
   await refreshPermission();
   if (listening) await NotificationsListener.restoreCachedNotifications().catch(() => {});
+  syncNow();
 });
+
+// Coba kirim ulang antrian berkala selama aplikasi terbuka (misalnya setelah internet kembali)
+setInterval(() => document.visibilityState === "visible" && syncNow(), 60_000);
 
 (async () => {
   let tab = "home";
@@ -257,10 +372,12 @@ document.addEventListener("visibilitychange", async () => {
   $("previewNote").classList.toggle("hidden", isNative);
   render();
   renderPermission();
+  renderConn();
   try {
     await startListener();
   } catch {
     toast("Pembaca notifikasi gagal dimulai.");
   }
   await refreshPermission();
+  syncNow();
 })();
