@@ -61,7 +61,7 @@ async function onNotification(n) {
   syncNow();
 }
 
-// ---------- sinkron ke web Atmosphere (K-35) ----------
+// ---------- sinkron ke web usaha (Protokol Setor: Kosinyuk, Atmosphere) ----------
 // Di APK pakai HTTP native (tanpa CORS); di pratinjau browser pakai fetch biasa
 async function postJson(url, body, token) {
   const headers = { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) };
@@ -101,15 +101,17 @@ async function pair() {
   try {
     url = normalizeServerUrl($("connUrl").value);
   } catch {
-    return toast("Alamat web tidak valid. Contoh: https://atmosphere-jb5u.vercel.app");
+    return toast("Alamat web tidak valid. Contoh: https://kosinyuk.id");
   }
   const code = $("connCode").value.trim().toUpperCase();
   if (code.length < 8) return toast("Isi kode pairing 8 karakter dari halaman admin.");
   $("connPair").disabled = true;
   try {
-    const res = await postJson(`${url}/api/devices/pair`, { code, name: $("connName").value.trim() || "HP Kasir" });
+    const res = await postJson(`${url}/api/devices/pair`, { code, name: $("connName").value.trim() || "HP Setor" });
     if (!res.data?.success) return toast(res.data?.error?.message || "Gagal menghubungkan. Cek alamat web.");
-    conn = { url, token: res.data.data.token, deviceName: res.data.data.device.name, pairedAt: Date.now() };
+    // band: jalur 3 digit usaha ini (Kosinyuk 500–999); web lama tanpa band menerima semua nominal
+    const d = res.data.data;
+    conn = { url, token: d.token, deviceName: d.device.name, business: d.business?.name ?? null, band: d.band ?? null, pairedAt: Date.now() };
     await Preferences.set({ key: KEY_CONN, value: JSON.stringify(conn) });
     $("connCode").value = "";
     toast("Terhubung ke web");
@@ -129,7 +131,7 @@ function renderConn() {
   const queued = pendingTx(txs, conn).length;
   $("connStatus").className = queued ? "notice warn" : "notice ok";
   $("connStatus").textContent =
-    `Terhubung ke ${new URL(conn.url).host} sebagai "${conn.deviceName}". ` +
+    `Terhubung ke ${conn.business ?? new URL(conn.url).host} sebagai "${conn.deviceName}". ` +
     (queued ? `${queued} pembayaran menunggu terkirim.` : "Semua pembayaran sudah terkirim.");
 }
 
@@ -138,6 +140,9 @@ const SYNC_CHIP = {
   ALREADY_PAID: ["Sudah lunas", "muted"],
   LATE_SLOT_TAKEN: ["Telat · refund", "warn"],
   NO_MATCH: ["Tak ada pesanan", "warn"],
+  matched: ["Lunas", "ok"],
+  unmatched: ["Tak ada tagihan", "warn"],
+  duplicate: ["Sudah tercatat", "muted"],
 };
 function syncChip(t) {
   if (t.sync?.state === "sent") return SYNC_CHIP[t.sync.result] ?? ["Terkirim", "muted"];
@@ -246,7 +251,7 @@ function openDetail(id) {
   $("detailRaw").textContent = `${t.title ? t.title + " — " : ""}${t.text}`;
   const sc = syncChip(t);
   $("detailSync").classList.toggle("hidden", !sc);
-  if (sc) $("detailSync").textContent = `Web: ${sc[0]}${t.sync?.code ? " · reservasi " + t.sync.code : ""}${t.sync?.error ? " · " + t.sync.error : ""}`;
+  if (sc) $("detailSync").textContent = `Web: ${sc[0]}${t.sync?.label ? " · " + t.sync.label : ""}${t.sync?.error ? " · " + t.sync.error : ""}`;
   $("detailLabel").value = t.label;
   $("detailNote").value = t.note;
   $("detail").showModal();

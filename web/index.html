@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#eef1f8">
   <link rel="icon" href="./icon-192.png">
   <style>
-    /* Warna navy Atmosphere, bentuk mengikuti referensi: tile berikon, kartu lembut, navigasi pill mengambang */
+    /* Warna navy Setor, bentuk mengikuti referensi: tile berikon, kartu lembut, navigasi pill mengambang */
     :root {
       --brand-dark: #111a38; --brand: #1c2955; --brand-soft: #e6ebf7; --magenta: #d81b60;
       --bg-top: #e9eef9; --bg-bottom: #f6f7fb; --card: #ffffff; --text: #111a38; --muted: #6b7489;
@@ -178,11 +178,11 @@
       </div>
       <div class="card">
         <h3>Hubungkan ke web</h3>
-        <p>Pembayaran yang tercatat otomatis dikirim ke web reservasi (Atmosphere), lalu pesanan dengan nominal yang cocok langsung jadi <b>Lunas</b>.</p>
+        <p>Pembayaran yang tercatat otomatis dikirim ke web usahamu (misalnya Kosinyuk), lalu tagihan dengan nominal yang cocok langsung jadi <b>Lunas</b>.</p>
         <div id="connForm" style="display:flex;flex-direction:column;gap:10px">
-          <div class="field"><label for="connUrl">Alamat web</label><input id="connUrl" class="input" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://atmosphere-jb5u.vercel.app"></div>
-          <div class="field"><label for="connCode">Kode pairing (dari Admin → Pengaturan → Hubungkan HP kasir)</label><input id="connCode" class="input" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="8 karakter"></div>
-          <div class="field"><label for="connName">Nama HP ini</label><input id="connName" class="input" maxlength="40" value="HP Kasir"></div>
+          <div class="field"><label for="connUrl">Alamat web</label><input id="connUrl" class="input" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://kosinyuk.id"></div>
+          <div class="field"><label for="connCode">Kode pairing (dari web usaha → Pengaturan → Hubungkan HP)</label><input id="connCode" class="input" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="8 karakter"></div>
+          <div class="field"><label for="connName">Nama HP ini</label><input id="connName" class="input" maxlength="40" value="HP Setor"></div>
           <button id="connPair" class="btn primary" type="button">Hubungkan</button>
         </div>
         <div id="connInfo" class="hidden" style="display:flex;flex-direction:column;gap:10px">
@@ -226,7 +226,7 @@
       </div>
       <div class="raw" id="detailRaw"></div>
       <div class="raw hidden" id="detailSync"></div>
-      <div class="field"><label for="detailLabel">Label</label><input id="detailLabel" class="input" maxlength="60" placeholder="Contoh: Booking R5Y2"></div>
+      <div class="field"><label for="detailLabel">Label</label><input id="detailLabel" class="input" maxlength="60" placeholder="Contoh: K3 · Budi"></div>
       <div class="field"><label for="detailNote">Catatan</label><textarea id="detailNote" class="input" maxlength="300" placeholder="Contoh: Budi, rombongan 8 orang"></textarea></div>
       <div class="row">
         <button class="btn danger" type="button" id="detailDelete">Hapus</button>

@@ -37,6 +37,21 @@ test("syncAll: label yang sudah diisi pengguna tidak ditimpa", async () => {
   assert.equal(out.list[0].label, "Pak Budi");
 });
 
+test("syncAll: label dari server (Kosinyuk) dipakai apa adanya", async () => {
+  const out = await syncAll([tx("a", 5)], conn, async () => ({
+    status: 200, data: { success: true, data: { result: "matched", label: "K3 · Budi" } },
+  }));
+  assert.equal(out.list[0].label, "K3 · Budi");
+  assert.equal(out.list[0].sync.label, "K3 · Budi");
+});
+
+test("pendingTx: dengan jalur dari pairing, nominal di luar jalur tidak dikirim", () => {
+  const kos = { ...conn, band: { min: 500, max: 999 } };
+  const list = [tx("kos", 5, { amount: 799873 }), tx("cafe", 6, { amount: 120350 }), tx("pribadi", 7, { amount: 50000 })];
+  assert.deepEqual(pendingTx(list, kos).map((t) => t.id), ["kos"]);
+  assert.equal(pendingTx(list, conn).length, 3); // web tanpa jalur (Atmosphere lama): semua dikirim
+});
+
 test("syncAll: offline → berhenti, sisanya tetap antri untuk dicoba lagi", async () => {
   let calls = 0;
   const out = await syncAll([tx("a", 1), tx("b", 2)], conn, async () => {
@@ -71,7 +86,7 @@ test("normalizeServerUrl: wajib https, buang garis miring & path", () => {
 test("mergeSynced: notif baru, edit label, dan hapus selama sinkron tetap terjaga", async () => {
   const { mergeSynced } = await import("./sync.js");
   const a = tx("a", 1), b = tx("b", 2);
-  const synced = [{ ...a, sync: { state: "sent", result: "MATCHED", code: "R5Y2" }, label: "Booking R5Y2" }, b];
+  const synced = [{ ...a, sync: { state: "sent", result: "MATCHED", label: "Booking R5Y2" }, label: "Booking R5Y2" }, b];
   const current = [{ ...a, label: "Pak Budi" }, tx("baru", 3)]; // b dihapus, a diberi label, ada notif baru
   const out = mergeSynced(current, synced);
   assert.deepEqual(out.map((t) => t.id), ["a", "baru"]);

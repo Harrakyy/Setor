@@ -37,6 +37,7 @@ Notifikasi yang masuk **sebelum** izin aktif tidak bisa dibaca.
 
 | Path | Isi |
 |---|---|
+| `sync.js` | Kirim uang masuk ke web usaha mengikuti [Protokol Setor](docs/PROTOKOL-SETOR.md): label dari web, hanya nominal di jalur usaha |
 | `core.js` | Logika murni: parse notifikasi, anti-dobel, total WIB, cari, CSV (`npm test`) |
 | `web/` | UI (navbar atas, kartu, warna navy) |
 | `build.mjs` | Bundle `web/` → `www/` dengan esbuild |

@@ -1,24 +1,23 @@
-// Sinkron ke web Atmosphere (K-35): kirim transaksi "Pembayaran Masuk" ke server supaya reservasi otomatis Lunas.
+// Sinkron ke web usaha (Protokol Setor, docs/PROTOKOL-SETOR.md): kirim "Pembayaran Masuk" supaya tagihan otomatis Lunas.
 // Murni: pengiriman HTTP disuntikkan lewat `send`, jadi bisa dites tanpa jaringan.
 
 const BACKFILL_MS = 60 * 60 * 1000; // transaksi sampai 1 jam sebelum pairing ikut dikirim
 
-/** Transaksi yang perlu dikirim, terlama dulu supaya urutan di server sesuai kejadian. */
+/** 3 digit terakhir nominal masuk jalur usaha? Tanpa jalur (web lama) = semua nominal dikirim. */
+export const inBand = (amount, band) => !band || (amount % 1000 >= band.min && amount % 1000 <= band.max);
+
+/** Transaksi yang perlu dikirim, terlama dulu supaya urutan di server sesuai kejadian. Di luar jalur tetap di HP saja. */
 export function pendingTx(list, conn) {
   if (!conn) return [];
   return list
-    .filter((t) => t.time >= conn.pairedAt - BACKFILL_MS && t.sync?.state !== "sent" && t.sync?.state !== "failed")
+    .filter((t) => t.time >= conn.pairedAt - BACKFILL_MS && inBand(t.amount, conn.band) && t.sync?.state !== "sent" && t.sync?.state !== "failed")
     .sort((a, b) => a.time - b.time);
 }
 
 const payloadOf = (t) => ({ notifId: t.id, amount: t.amount, time: t.time, text: t.text });
 
-function withSync(list, id, sync, code) {
-  return list.map((t) => {
-    if (t.id !== id) return t;
-    const label = !t.label && code ? `Booking ${code}` : t.label;
-    return { ...t, label, sync };
-  });
+function withSync(list, id, sync, serverLabel) {
+  return list.map((t) => (t.id === id ? { ...t, label: t.label || serverLabel || "", sync } : t));
 }
 
 /**
@@ -39,8 +38,10 @@ export async function syncAll(list, conn, send, now = Date.now()) {
     }
     if (res.status === 401) return { list: out, revoked: true };
     if (res.status >= 200 && res.status < 300 && res.data?.success) {
-      const { result, reservationCode } = res.data.data;
-      out = withSync(out, t.id, { state: "sent", result, code: reservationCode ?? null, at: now }, reservationCode);
+      // `label` dari web mana pun (Kosinyuk: "K3 · Budi"); `reservationCode` dari Atmosphere versi lama
+      const { result, label, reservationCode } = res.data.data;
+      const serverLabel = label ?? (reservationCode ? `Booking ${reservationCode}` : null);
+      out = withSync(out, t.id, { state: "sent", result, label: serverLabel, at: now }, serverLabel);
     } else if (res.status >= 400 && res.status < 500 && res.status !== 429) {
       // Ditolak permanen (data tidak valid): jangan dikirim berulang
       out = withSync(out, t.id, { state: "failed", error: res.data?.error?.message ?? `HTTP ${res.status}`, at: now });
