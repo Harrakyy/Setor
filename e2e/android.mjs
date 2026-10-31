@@ -110,7 +110,7 @@ try {
     document.querySelector("#recentList .tx").click(); await wait(400);
     $("detailLabel").value = "Booking R5Y2"; $("detailNote").value = "Budi 8 orang";
     $("detailSave").click(); await wait(600);
-    const chip = document.querySelector("#recentList .chip")?.textContent;
+    const chip = [...document.querySelectorAll("#recentList .tx:first-child .chip")].map((c) => c.textContent).find((c) => c !== "DANA");
     document.querySelector('[data-tab="tx"]').click(); await wait(300);
     $("exportCsv").click(); await wait(2500);
     return { chip };

@@ -15,6 +15,10 @@ const rupiah = (n) => "Rp " + n.toLocaleString("id-ID");
 const fmtWhen = (ms) =>
   new Date(ms).toLocaleString("id-ID", { timeZone: "Asia/Jakarta", day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) + " WIB";
 
+// Versi ringkas untuk kartu; detail tetap memakai tanggal lengkap
+const fmtShort = (ms) =>
+  new Date(ms).toLocaleString("id-ID", { timeZone: "Asia/Jakarta", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+
 let txs = [];
 let packages = DEFAULT_PKGS;
 let editingId = null;
@@ -70,24 +74,25 @@ async function refreshPermission() {
 }
 
 // ---------- tampilan ----------
-const icoIn = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m0 0-6-6m6 6 6-6"/></svg>';
+const icoCal = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>';
+const icoMore = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
 
+// Kartu bertint: nominal, catatan, chip label, dan tanggal di kanan
 function txRow(t) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "tx";
   btn.dataset.id = t.id;
-  btn.innerHTML = `<span class="dot">${icoIn}</span><span class="main"><span class="amt"></span><span class="meta"></span></span>`;
+  btn.innerHTML = `<span class="amt"></span><span class="note"></span><span class="foot"><span class="chips"></span><span class="when">${icoCal}<span></span></span></span><span class="more" aria-hidden="true">${icoMore}</span>`;
   btn.querySelector(".amt").textContent = rupiah(t.amount);
-  const meta = btn.querySelector(".meta");
-  if (t.label) {
-    const chip = document.createElement("span");
-    chip.className = "chip";
-    chip.textContent = t.label;
-    meta.append(chip);
-  }
-  meta.append(fmtWhen(t.time) + (t.note ? " · " + t.note : ""));
-  btn.setAttribute("aria-label", `${rupiah(t.amount)}, ${fmtWhen(t.time)}${t.label ? ", " + t.label : ""}`);
+  const note = btn.querySelector(".note");
+  if (t.note) note.textContent = t.note;
+  else note.remove();
+  const chips = btn.querySelector(".chips");
+  chips.append(Object.assign(document.createElement("span"), { className: "chip", textContent: "DANA" }));
+  if (t.label) chips.append(Object.assign(document.createElement("span"), { className: "chip", textContent: t.label }));
+  btn.querySelector(".when span").textContent = fmtShort(t.time);
+  btn.setAttribute("aria-label", `${rupiah(t.amount)}, ${fmtWhen(t.time)}${t.label ? ", " + t.label : ""}${t.note ? ", " + t.note : ""}`);
   btn.addEventListener("click", () => openDetail(t.id));
   return btn;
 }
