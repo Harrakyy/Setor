@@ -20,20 +20,14 @@
     button, input, textarea { font: inherit; color: inherit; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    /* Navbar atas */
-    .nav { position: sticky; top: 0; z-index: 20; background: #fff; border-bottom: 1px solid var(--border); box-shadow: var(--shadow); padding-top: env(safe-area-inset-top); }
-    .nav-inner { max-width: 720px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; }
-    .logo { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, var(--brand-dark), var(--brand)); box-shadow: 0 2px 6px rgba(17, 26, 56, .25); }
-    .brand small { display: block; font-size: 11px; color: var(--muted); line-height: 1.1; }
-    .brand b { display: block; font-size: 16px; color: var(--brand-dark); line-height: 1.2; }
-    .tabs { display: flex; gap: 4px; background: var(--brand-light); padding: 4px; border-radius: 999px; width: 100%; }
-    @media (min-width: 560px) { .tabs { width: auto; } }
-    .tab { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: transparent; padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; min-height: 40px; }
-    .tab[aria-selected="true"] { background: var(--brand); color: #fff; box-shadow: var(--shadow); }
-    .tab svg { width: 16px; height: 16px; }
+    /* Navigasi bawah */
+    .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: #fff; border-top: 1px solid var(--border); box-shadow: 0 -2px 10px rgba(17, 26, 56, .06); padding-bottom: env(safe-area-inset-bottom); }
+    .tabs { max-width: 720px; margin: 0 auto; display: flex; padding: 6px 8px; gap: 4px; }
+    .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 0; background: transparent; padding: 6px 4px; border-radius: 14px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; min-height: 56px; }
+    .tab[aria-selected="true"] { color: var(--brand); background: var(--brand-light); }
+    .tab svg { width: 22px; height: 22px; }
 
-    main { max-width: 720px; margin: 0 auto; padding: 18px 16px 48px; display: flex; flex-direction: column; gap: 14px; }
+    main { max-width: 720px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; }
     .page-head h1 { margin: 0; font-size: 22px; color: var(--brand-dark); }
     .page-head p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
 
@@ -84,31 +78,17 @@
     .sheet { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
     .sheet .big { font-size: 26px; font-weight: 800; color: var(--brand-dark); }
     .sheet .raw { font-size: 13px; color: var(--muted); background: var(--bg); border-radius: 10px; padding: 8px 10px; }
-    .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--brand-dark); color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); z-index: 50; max-width: calc(100% - 32px); }
+    .toast { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--brand-dark); color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); z-index: 50; max-width: calc(100% - 32px); }
     .hidden { display: none !important; }
     ol.steps { margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
     ol.steps li { margin: 4px 0; }
   </style>
 </head>
 <body>
-  <header class="nav">
-    <div class="nav-inner">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>
-        <div><small>Catatan Pembayaran DANA</small><b>SetorPantau</b></div>
-      </div>
-      <nav class="tabs" role="tablist" aria-label="Menu">
-        <button class="tab" role="tab" data-tab="home" id="tab-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg>Beranda</button>
-        <button class="tab" role="tab" data-tab="tx" id="tab-tx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Transaksi</button>
-        <button class="tab" role="tab" data-tab="settings" id="tab-settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Pengaturan</button>
-      </nav>
-    </div>
-  </header>
 
   <main>
     <!-- Beranda -->
     <section id="view-home" role="tabpanel" aria-labelledby="tab-home">
-      <div class="page-head"><h1>Beranda</h1><p>Ringkasan uang masuk dari notifikasi DANA.</p></div>
       <div id="permWarn" class="notice warn hidden" role="alert"></div>
       <div id="previewNote" class="notice warn hidden">
         <b>Mode pratinjau (browser)</b>
@@ -174,6 +154,14 @@
       </div>
     </section>
   </main>
+
+  <div class="nav">
+    <nav class="tabs" role="tablist" aria-label="Menu">
+      <button class="tab" role="tab" data-tab="home" id="tab-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg>Beranda</button>
+      <button class="tab" role="tab" data-tab="tx" id="tab-tx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Transaksi</button>
+      <button class="tab" role="tab" data-tab="settings" id="tab-settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Pengaturan</button>
+    </nav>
+  </div>
 
   <dialog id="detail" aria-labelledby="detailAmount">
     <form method="dialog" class="sheet" id="detailForm">
