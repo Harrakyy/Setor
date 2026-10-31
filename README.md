@@ -22,12 +22,12 @@ Contoh notifikasi yang dicatat:
 ## Pasang di HP
 
 1. Unduh APK terbaru dari HP: **https://github.com/Harrakyy/Setor/releases/download/latest/SetorPantau-latest-debug.apk**
-   - Repo ini **privat**: link di atas hanya bisa dibuka setelah **masuk GitHub** di browser HP dengan akun yang punya akses ke repo. Tanpa login hasilnya 404.
-   - Cara lain: buka **https://github.com/Harrakyy/Setor/releases/tag/latest** (sudah login) lalu ketuk **SetorPantau-latest-debug.apk**, atau unduh di laptop lalu kirim ke HP (WhatsApp ke diri sendiri, kabel USB, Google Drive).
-   - APK ini dibuat otomatis oleh GitHub Actions setiap ada push ke `main` (tab **Actions → Android APK**).
+   - Atau buka halaman rilis **https://github.com/Harrakyy/Setor/releases/tag/latest** lalu ketuk **SetorPantau-latest-debug.apk**.
+   - APK ini dibuat otomatis oleh GitHub Actions setiap ada push ke `main` (tab **Actions → Android APK**), jadi selalu versi terbaru.
+   - Link 404? Repo masih privat: ubah di **Settings → General → Danger Zone → Change visibility → Public**, atau unduh sambil login GitHub.
 2. Buka file APK-nya, izinkan **"Instal aplikasi tidak dikenal"**, lalu **Instal**. Kalau sudah ada versi lama dengan tanda tangan berbeda, hapus dulu versi lamanya.
-3. Buka SetorPantau → **Pengaturan → Buka pengaturan izin** → aktifkan **SetorPantau** di Akses Notifikasi.
-4. Matikan penghemat baterai: **Setelan → Aplikasi → SetorPantau → Baterai → Tidak dibatasi**. Tanpa ini, Android bisa menghentikan pembaca notifikasi diam-diam.
+3. Buka Setor → **Pengaturan → Buka pengaturan izin** → aktifkan **Setor** di Akses Notifikasi.
+4. Matikan penghemat baterai: **Setelan → Aplikasi → Setor → Baterai → Tidak dibatasi**. Tanpa ini, Android bisa menghentikan pembaca notifikasi diam-diam.
 
 5. Opsional, hubungkan ke web usaha: di web (mis. Kosinyuk → Pengaturan → **Hubungkan HP**) muncul alamat web + kode 8 karakter. Di Setor: **Pengaturan → Hubungkan ke web**, isi keduanya, lalu **Hubungkan**.
 

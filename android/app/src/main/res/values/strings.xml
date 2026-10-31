@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">SetorPantau</string>
-    <string name="title_activity_main">SetorPantau</string>
+    <string name="app_name">Setor</string>
+    <string name="title_activity_main">Setor</string>
     <string name="package_name">com.harrakyy.setorpantau</string>
     <string name="custom_url_scheme">com.harrakyy.setorpantau</string>
 </resources>
