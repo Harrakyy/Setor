@@ -127,6 +127,14 @@ async function pair() {
 function renderConn() {
   $("connForm").classList.toggle("hidden", !!conn);
   $("connInfo").classList.toggle("hidden", !conn);
+  const name = conn ? conn.business ?? new URL(conn.url).host : "Belum terhubung ke web usaha";
+  const info = conn
+    ? `DANA · ${conn.band ? `jalur ${String(conn.band.min).padStart(3, "0")}–${conn.band.max}` : "semua nominal"}`
+    : "Ketuk untuk menghubungkan, misalnya ke Kosinyuk";
+  $("homeConn").innerHTML = `<span class="gi"></span><span class="gt"><b></b><span></span></span>`;
+  $("homeConn").querySelector(".gi").textContent = conn ? name.slice(0, 2).toUpperCase() : "+";
+  $("homeConn").querySelector("b").textContent = name;
+  $("homeConn").querySelector(".gt span").textContent = info;
   if (!conn) return;
   const queued = pendingTx(txs, conn).length;
   $("connStatus").className = queued ? "notice warn" : "notice ok";
@@ -171,21 +179,19 @@ async function refreshPermission() {
 }
 
 // ---------- tampilan ----------
-// Kartu bertint 2 baris: nominal + waktu, lalu chip label + catatan
+// Baris: avatar (awal label), label + waktu, nominal + status kirim
 function txRow(t) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "tx";
   btn.dataset.id = t.id;
-  btn.innerHTML = `<span class="top"><span class="amt"></span><span class="when"></span></span><span class="sub"></span>`;
+  btn.innerHTML = `<span class="av"></span><span class="mid"><span class="label"></span><span class="when"></span></span><span class="right"><span class="amt"></span></span>`;
+  btn.querySelector(".av").textContent = t.label ? t.label.split(/[\s·]+/)[0].slice(0, 3) : "Rp";
+  btn.querySelector(".label").textContent = t.label || "Uang masuk";
+  btn.querySelector(".when").textContent = `${fmtShort(t.time)} · DANA${t.note ? " · " + t.note : ""}`;
   btn.querySelector(".amt").textContent = rupiah(t.amount);
-  btn.querySelector(".when").textContent = fmtShort(t.time);
-  const sub = btn.querySelector(".sub");
-  sub.append(Object.assign(document.createElement("span"), { className: "chip", textContent: "DANA" }));
-  if (t.label) sub.append(Object.assign(document.createElement("span"), { className: "chip", textContent: t.label }));
   const sc = syncChip(t);
-  if (sc) sub.append(Object.assign(document.createElement("span"), { className: `chip ${sc[1]}`, textContent: sc[0] }));
-  if (t.note) sub.append(Object.assign(document.createElement("span"), { className: "note", textContent: t.note }));
+  if (sc) btn.querySelector(".right").append(Object.assign(document.createElement("span"), { className: `chip ${sc[1]}`, textContent: sc[0] }));
   btn.setAttribute("aria-label", `${rupiah(t.amount)}, ${fmtWhen(t.time)}${t.label ? ", " + t.label : ""}${t.note ? ", " + t.note : ""}`);
   btn.addEventListener("click", () => openDetail(t.id));
   return btn;
@@ -202,6 +208,7 @@ function render() {
   $("todaySum").textContent = rupiah(t.today.sum);
   $("todayCount").textContent = `${t.today.count} transaksi`;
   $("monthSum").textContent = rupiah(t.month.sum);
+  $("monthLabel").textContent = `Uang masuk ${new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta", month: "long" })}`;
   $("monthCount").textContent = `${t.month.count} transaksi`;
   fillList($("recentList"), txs.slice(0, 5), "Belum ada pembayaran masuk tercatat.");
 
@@ -331,6 +338,8 @@ $("resetFilter").addEventListener("click", () => {
 });
 $("exportCsv").addEventListener("click", () => exportCsv(filterTx(txs, currentFilter())));
 $("exportCsv2").addEventListener("click", () => exportCsv(txs));
+$("exportCsv3").addEventListener("click", () => exportCsv(txs));
+for (const id of ["goConnect", "homeConn"]) $(id).addEventListener("click", () => setTab("settings"));
 $("grant").addEventListener("click", requestPermission);
 $("connPair").addEventListener("click", pair);
 $("connRetry").addEventListener("click", async () => {

@@ -4,151 +4,158 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Setor — Catatan Pembayaran DANA</title>
-  <meta name="theme-color" content="#eef1f8">
+  <meta name="theme-color" content="#0a1a47">
   <link rel="icon" href="./icon-192.png">
   <style>
-    /* Warna navy Setor, bentuk mengikuti referensi: tile berikon, kartu lembut, navigasi pill mengambang */
+    /* Tampilan mengikuti desain canvas Setor: header gradien navy, lembar putih, tombol pil, navigasi pil mengambang */
     :root {
-      --brand-dark: #111a38; --brand: #1c2955; --brand-soft: #e6ebf7; --magenta: #d81b60;
-      --bg-top: #e9eef9; --bg-bottom: #f6f7fb; --card: #ffffff; --text: #111a38; --muted: #6b7489;
-      --tint-blue: #e7eefb; --tint-green: #e8f6ed; --tint-amber: #fdf3e2;
-      --success: #15803d; --danger: #b91c1c; --warn: #92400e;
-      --shadow: 0 6px 20px rgba(17, 26, 56, .06), 0 1px 3px rgba(17, 26, 56, .05);
+      --navy: #0a1a47; --royal: #14389e; --sky: #3d78f0; --ink: #0f172a; --mist: #f1f4f9; --tint: #e6edfd;
+      --muted: #64748b; --line: #eef2f7; --card: #ffffff; --warn: #9a4a06; --warnbg: #fef3e2; --danger: #b91c1c;
+      --hero: linear-gradient(180deg, #0a1a47 0%, #14389e 62%, #3d78f0 100%);
     }
     * { box-sizing: border-box; }
-    html { background: var(--bg-bottom); }
-    body { margin: 0; min-height: 100vh; color: var(--text); background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 420px); font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+    html { background: var(--mist); }
+    body { margin: 0; min-height: 100vh; color: var(--ink); background: var(--mist); font: 15px/1.5 Manrope, Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
     button, input, textarea { font: inherit; color: inherit; }
     .hidden { display: none !important; }
-    :focus-visible { outline: 3px solid var(--magenta); outline-offset: 2px; }
+    :focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
     svg { flex: none; }
 
-    main { max-width: 560px; margin: 0 auto; padding: calc(12px + env(safe-area-inset-top)) 14px calc(92px + env(safe-area-inset-bottom)); }
-    section { display: flex; flex-direction: column; gap: 10px; }
+    main { max-width: 560px; margin: 0 auto; padding: 0 16px calc(96px + env(safe-area-inset-bottom)); }
+    section { display: flex; flex-direction: column; gap: 14px; }
 
-    /* Judul halaman di tengah dengan tombol bulat di kanan (seperti "Create Note") */
-    .topbar { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; gap: 8px; }
-    .topbar h1 { margin: 0; text-align: center; font-size: 18px; font-weight: 600; color: var(--brand-dark); }
-    .round { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--card); box-shadow: var(--shadow); display: grid; place-items: center; cursor: pointer; color: var(--brand-dark); }
-    .round svg { width: 18px; height: 18px; }
+    /* Header gradien yang menempel ke tepi layar */
+    .hero { margin: 0 -16px; padding: calc(20px + env(safe-area-inset-top)) 20px 26px; background: var(--hero); color: #fff; border-radius: 0 0 36px 36px; display: flex; flex-direction: column; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; letter-spacing: -.3px; }
+    .brand img { width: 36px; height: 36px; border-radius: 10px; box-shadow: 0 0 0 1px rgba(255,255,255,.2); }
+    .hero-center { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+    .hero-label { margin: 0; font-size: 15px; color: rgba(255,255,255,.82); }
+    .hero-amt { margin: 0; font-size: 42px; font-weight: 700; letter-spacing: -1.4px; line-height: 1.05; }
+    .hero-pill { margin: 4px 0 0; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 13px; }
+    .hero-pill b { font-weight: 700; }
+    .hero h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.4px; }
+    .hero-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .glass { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.22); color: #fff; text-decoration: none; text-align: left; width: 100%; cursor: pointer; }
+    .glass .gi { width: 36px; height: 36px; border-radius: 12px; background: rgba(255,255,255,.18); display: grid; place-items: center; font-size: 13px; font-weight: 800; }
+    .glass .gt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .glass .gt b { font-size: 14px; }
+    .glass .gt span { font-size: 12px; color: rgba(255,255,255,.78); }
+    .round { width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.16); color: #fff; display: grid; place-items: center; cursor: pointer; }
+    .round svg { width: 20px; height: 20px; }
 
-    /* Tile berikon */
-    .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .tile { background: var(--card); border-radius: 18px; padding: 12px 14px; box-shadow: var(--shadow); display: grid; grid-template-columns: 30px 1fr; column-gap: 8px; align-items: center; }
-    .tile .ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: #f1f3f8; color: var(--brand-dark); }
-    .tile .ico svg { width: 16px; height: 16px; }
-    .tile span { font-size: 12px; font-weight: 600; color: var(--muted); }
-    .tile b { grid-column: 1 / -1; margin-top: 8px; font-size: 18px; font-weight: 700; line-height: 1.2; word-break: break-word; }
-    .tile small { grid-column: 1 / -1; font-size: 11px; color: var(--muted); }
-    .tile.hero { background: var(--brand); color: #fff; transform: rotate(-2deg); box-shadow: 0 8px 18px rgba(28, 41, 85, .25); }
-    .tile.hero .ico { background: rgba(255, 255, 255, .95); color: var(--brand); }
-    .tile.hero span, .tile.hero small { color: rgba(255, 255, 255, .78); }
+    .actions { display: flex; gap: 10px; }
+    .pill { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border-radius: 999px; border: 1px solid #e2e8f0; background: var(--card); font-size: 15px; font-weight: 700; cursor: pointer; color: var(--ink); }
+    .pill svg { width: 18px; height: 18px; }
 
-    h2 { margin: 4px 2px 0; font-size: 15px; font-weight: 600; color: var(--brand-dark); }
+    h2 { margin: 6px 2px 0; font-size: 19px; font-weight: 700; letter-spacing: -.3px; }
 
-    /* Kartu transaksi bertint seperti "Recent Notes" */
-    .list { display: flex; flex-direction: column; gap: 8px; }
-    .tx { display: block; width: 100%; text-align: left; border: 0; cursor: pointer; border-radius: 16px; padding: 10px 14px; background: var(--tint-blue); }
-    .list .tx:nth-child(3n+2) { background: var(--tint-green); }
-    .list .tx:nth-child(3n+3) { background: var(--tint-amber); }
-    .tx .top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-    .tx .amt { font-size: 16px; font-weight: 600; color: var(--brand-dark); }
-    .tx .when { font-size: 12px; color: var(--muted); white-space: nowrap; }
-    .tx .sub { display: flex; align-items: center; gap: 6px; margin-top: 4px; min-width: 0; }
-    .chip.ok { background: #dcf3e4; color: var(--success); }
-    .chip.warn { background: #fdecc8; color: var(--warn); }
-    .chip.muted { background: #eceef3; color: var(--muted); }
-    .chip { font-size: 11px; font-weight: 500; color: var(--brand-dark); background: #fff; border-radius: 999px; padding: 1px 9px; white-space: nowrap; }
-    .tx .note { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-    .empty { text-align: center; color: var(--muted); font-size: 13px; padding: 20px 12px; background: var(--card); border-radius: 16px; box-shadow: var(--shadow); }
+    /* Baris transaksi: avatar, label + waktu, nominal + status */
+    .list { display: flex; flex-direction: column; background: var(--card); border-radius: 24px; padding: 4px 14px; }
+    .tx { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; cursor: pointer; padding: 12px 0; }
+    .tx:last-child { border-bottom: 0; }
+    .tx .av { width: 42px; height: 42px; border-radius: 21px; background: var(--mist); color: var(--royal); display: grid; place-items: center; font-size: 12px; font-weight: 800; flex: none; }
+    .tx .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .tx .label { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tx .when { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tx .right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+    .tx .amt { font-size: 15px; font-weight: 700; white-space: nowrap; }
+    .chip { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; white-space: nowrap; background: var(--mist); color: var(--muted); }
+    .chip.ok { background: var(--tint); color: var(--royal); }
+    .chip.warn { background: var(--warnbg); color: var(--warn); }
+    .chip.muted { background: var(--mist); color: var(--muted); }
+    .empty { text-align: center; color: var(--muted); font-size: 13px; padding: 20px 12px; }
 
     /* Kartu & form */
-    .card { background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-    .card h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--brand-dark); }
+    .card { background: var(--card); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .card h3 { margin: 0; font-size: 17px; font-weight: 700; }
     .card p { margin: 0; font-size: 13px; color: var(--muted); }
-    .search { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 999px; padding: 0 16px; min-height: 44px; box-shadow: var(--shadow); }
-    .search svg { width: 18px; height: 18px; color: var(--muted); }
-    .search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 10px 0; font-size: 14px; }
+    .search { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 999px; padding: 0 16px; min-height: 50px; color: var(--muted); }
+    .search svg { width: 18px; height: 18px; }
+    .search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 10px 0; font-size: 15px; color: var(--ink); }
     .field { display: flex; flex-direction: column; gap: 6px; }
-    .field label { font-size: 12px; font-weight: 600; color: var(--muted); padding-left: 4px; }
-    .input { width: 100%; min-height: 44px; border: 1px solid #e3e6ef; border-radius: 12px; padding: 8px 12px; background: #fff; }
+    .field label { font-size: 13px; font-weight: 600; color: #334155; padding-left: 2px; }
+    .input { width: 100%; min-height: 48px; border: 1px solid #e2e8f0; border-radius: 14px; padding: 8px 14px; background: #fff; }
     textarea.input { min-height: 96px; resize: vertical; }
     .row { display: flex; gap: 10px; flex-wrap: wrap; }
     .row > * { flex: 1 1 130px; }
-    .pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--card); box-shadow: var(--shadow); font-size: 13px; font-weight: 600; cursor: pointer; color: var(--brand-dark); }
-    .pill svg { width: 15px; height: 15px; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: #f1f3f8; font-weight: 600; cursor: pointer; color: var(--brand-dark); }
-    .btn.primary { background: var(--brand); color: #fff; }
-    .btn.danger { background: #fdecec; color: var(--danger); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 999px; border: 1px solid #e2e8f0; background: #fff; font-weight: 700; cursor: pointer; color: var(--ink); }
+    .btn.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .btn.danger { color: var(--warn); border-color: #f3c6a0; }
     .btn:disabled { opacity: .5; cursor: not-allowed; }
-    details.filter { background: var(--card); border-radius: 18px; box-shadow: var(--shadow); }
-    details.filter summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; min-height: 44px; font-size: 13px; font-weight: 600; color: var(--brand-dark); }
+    details.filter { background: var(--card); border-radius: 24px; }
+    details.filter summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; min-height: 50px; font-size: 14px; font-weight: 700; }
     details.filter summary::-webkit-details-marker { display: none; }
     details.filter summary::after { content: "\25BE"; color: var(--muted); }
     details.filter[open] summary::after { content: "\25B4"; }
-    details.filter .body { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 10px; }
-    .summary { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); padding: 0 6px; }
-    .summary b { color: var(--brand-dark); }
+    details.filter .body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .summary { display: flex; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,.85); }
+    .summary b { color: #fff; }
 
-    .notice { border-radius: 16px; padding: 12px 14px; font-size: 13px; display: flex; flex-direction: column; gap: 10px; }
-    .notice.warn { background: #fff7e6; color: var(--warn); }
-    .notice.ok { background: var(--tint-green); color: var(--success); }
+    .notice { border-radius: 18px; padding: 12px 14px; font-size: 13px; display: flex; flex-direction: column; gap: 10px; }
+    .notice.warn { background: var(--warnbg); color: var(--warn); }
+    .notice.ok { background: var(--tint); color: var(--royal); }
     .notice b { font-size: 14px; }
     ol.steps { margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
     ol.steps li { margin: 4px 0; }
 
-    /* Navigasi pill gelap mengambang */
-    .dock { position: fixed; left: 50%; bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 30; background: var(--brand-dark); border-radius: 999px; padding: 6px; box-shadow: 0 12px 30px rgba(17, 26, 56, .35); }
+    /* Navigasi pil terang mengambang, item aktif lingkaran gelap */
+    .dock { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 30; background: rgba(241,244,249,.94); backdrop-filter: blur(8px); border-radius: 999px; padding: 6px; box-shadow: 0 8px 24px rgba(15,23,42,.14); }
     .tabs { display: flex; gap: 6px; }
-    .tab { width: 46px; height: 46px; border-radius: 50%; border: 0; background: #fff; color: var(--brand-dark); display: grid; place-items: center; cursor: pointer; }
-    .tab svg { width: 20px; height: 20px; }
-    .tab[aria-selected="true"] { background: #4f6bd8; color: #fff; }
+    .tab { width: 50px; height: 50px; border-radius: 50%; border: 0; background: transparent; color: var(--ink); display: grid; place-items: center; cursor: pointer; }
+    .tab svg { width: 21px; height: 21px; }
+    .tab[aria-selected="true"] { background: var(--ink); color: #fff; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    dialog { border: 0; border-radius: 28px; padding: 0; width: min(520px, calc(100% - 24px)); box-shadow: 0 24px 60px rgba(17, 26, 56, .3); background: var(--bg-bottom); }
-    dialog::backdrop { background: rgba(17, 26, 56, .45); }
-    .sheet { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-    .sheet .big { font-size: 28px; font-weight: 700; color: var(--brand-dark); }
-    .sheet .raw { font-size: 13px; color: var(--muted); background: #fff; border-radius: 16px; padding: 10px 12px; }
-    .toast { position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--brand-dark); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); z-index: 50; max-width: calc(100% - 32px); }
+    dialog { border: 0; border-radius: 32px 32px 0 0; padding: 0; margin: auto auto 0; width: min(560px, 100%); max-width: 100%; box-shadow: 0 -12px 40px rgba(15,23,42,.25); background: #fff; }
+    dialog::backdrop { background: rgba(10,26,71,.55); }
+    .sheet { padding: 14px 20px calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+    .sheet::before { content: ""; align-self: center; width: 44px; height: 5px; border-radius: 3px; background: #cbd5e1; }
+    .sheet .big { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
+    .sheet .raw { font-size: 13px; color: #334155; background: var(--mist); border-radius: 16px; padding: 10px 12px; }
+    .toast { position: fixed; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; z-index: 50; max-width: calc(100% - 32px); }
   </style>
 </head>
 <body>
   <main>
     <!-- Beranda -->
     <section id="view-home" role="tabpanel" aria-labelledby="tab-home">
+      <header class="hero">
+        <div class="brand"><img src="./icon-192.png" alt=""><span>Setor</span></div>
+        <div class="hero-center">
+          <p class="hero-label" id="monthLabel">Uang masuk bulan ini</p>
+          <p class="hero-amt" id="monthSum">Rp 0</p>
+          <p class="hero-pill"><span id="monthCount">0 transaksi</span> · hari ini <b id="todaySum">Rp 0</b> (<span id="todayCount">0 transaksi</span>)</p>
+        </div>
+        <button id="homeConn" class="glass" type="button"></button>
+      </header>
       <div id="permWarn" class="notice warn hidden" role="alert"></div>
       <div id="previewNote" class="notice warn hidden">
         <b>Mode pratinjau (browser)</b>
         Pembaca notifikasi hanya berjalan di aplikasi Android. Pakai tombol di bawah untuk mencoba alurnya.
-        <button id="simulate" class="pill" type="button">Simulasikan notif masuk</button>
+        <button id="simulate" class="btn" type="button">Simulasikan notif masuk</button>
       </div>
-      <div class="tiles">
-        <div class="tile">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
-          <span>Bulan ini</span><b id="monthSum">Rp 0</b><small id="monthCount">0 transaksi</small>
-        </div>
-        <div class="tile hero">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l3-8 4 16 3-8h7"/></svg></div>
-          <span>Hari ini</span><b id="todaySum">Rp 0</b><small id="todayCount">0 transaksi</small>
-        </div>
+      <div class="actions">
+        <button id="goConnect" class="pill" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Hubungkan</button>
+        <button id="exportCsv3" class="pill" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Ekspor</button>
       </div>
-      <h2>Transaksi terbaru</h2>
+      <h2>Uang masuk terbaru</h2>
       <div id="recentList" class="list"></div>
     </section>
 
     <!-- Transaksi -->
     <section id="view-tx" role="tabpanel" aria-labelledby="tab-tx" class="hidden">
-      <div class="topbar">
-        <span></span>
-        <h1>Transaksi</h1>
-        <button id="exportCsv" class="round" type="button" aria-label="Ekspor CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg></button>
-      </div>
+      <header class="hero">
+        <div class="hero-row">
+          <h1>Transaksi</h1>
+          <button id="exportCsv" class="round" type="button" aria-label="Ekspor CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+        </div>
+        <div class="summary"><span id="filterCount">0 transaksi</span><span>Total <b id="filterSum">Rp 0</b></span></div>
       <label class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <span class="sr-only">Cari transaksi</span>
         <input id="q" type="search" inputmode="search" placeholder="Cari nominal, label, catatan…" autocomplete="off">
       </label>
+      </header>
       <details class="filter">
         <summary>Filter tanggal</summary>
         <div class="body">
@@ -156,16 +163,15 @@
             <div class="field"><label for="from">Dari</label><input id="from" class="input" type="date"></div>
             <div class="field"><label for="to">Sampai</label><input id="to" class="input" type="date"></div>
           </div>
-          <button id="resetFilter" class="pill" type="button" style="align-self:flex-start">Reset filter</button>
+          <button id="resetFilter" class="btn" type="button" style="align-self:flex-start">Reset filter</button>
         </div>
       </details>
-      <div class="summary"><span id="filterCount">0 transaksi</span><span>Total <b id="filterSum">Rp 0</b></span></div>
       <div id="txList" class="list"></div>
     </section>
 
     <!-- Pengaturan -->
     <section id="view-settings" role="tabpanel" aria-labelledby="tab-settings" class="hidden">
-      <div class="topbar"><span></span><h1>Pengaturan</h1><span></span></div>
+      <header class="hero"><h1>Pengaturan</h1><p class="hero-label" style="text-align:left">Izin notifikasi, koneksi ke web usaha, dan data.</p></header>
       <div class="card">
         <h3>Akses Notifikasi</h3>
         <div id="permStatus" class="notice warn">Memeriksa izin…</div>
@@ -204,7 +210,7 @@
       </div>
       <div class="card">
         <h3>Data</h3>
-        <p>Semua catatan tersimpan di HP ini saja. Ekspor rutin supaya tidak hilang kalau aplikasi di-uninstall.</p>
+        <p>Catatan transaksi tersimpan di HP ini. Ekspor rutin supaya tidak hilang kalau aplikasi di-uninstall.</p>
         <button id="exportCsv2" class="btn" type="button">Ekspor semua ke CSV</button>
       </div>
     </section>
@@ -212,8 +218,8 @@
 
   <div class="dock">
     <nav class="tabs" role="tablist" aria-label="Menu">
-      <button class="tab" role="tab" data-tab="home" id="tab-home" aria-label="Beranda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg></button>
-      <button class="tab" role="tab" data-tab="tx" id="tab-tx" aria-label="Transaksi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></button>
+      <button class="tab" role="tab" data-tab="home" id="tab-home" aria-label="Beranda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/></svg></button>
+      <button class="tab" role="tab" data-tab="tx" id="tab-tx" aria-label="Transaksi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4"/></svg></button>
       <button class="tab" role="tab" data-tab="settings" id="tab-settings" aria-label="Pengaturan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></button>
     </nav>
   </div>
@@ -227,7 +233,7 @@
       <div class="raw" id="detailRaw"></div>
       <div class="raw hidden" id="detailSync"></div>
       <div class="field"><label for="detailLabel">Label</label><input id="detailLabel" class="input" maxlength="60" placeholder="Contoh: K3 · Budi"></div>
-      <div class="field"><label for="detailNote">Catatan</label><textarea id="detailNote" class="input" maxlength="300" placeholder="Contoh: Budi, rombongan 8 orang"></textarea></div>
+      <div class="field"><label for="detailNote">Catatan</label><textarea id="detailNote" class="input" maxlength="300" placeholder="Contoh: bayar lewat adiknya"></textarea></div>
       <div class="row">
         <button class="btn danger" type="button" id="detailDelete">Hapus</button>
         <button class="btn" value="cancel" formnovalidate>Tutup</button>
