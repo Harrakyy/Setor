@@ -1,6 +1,6 @@
-# SetorPantau — Catatan Pembayaran DANA
+# Setor — Catatan & Sinkron Pembayaran DANA
 
-Aplikasi Android yang **membaca notifikasi DANA "Pembayaran Masuk"**, lalu otomatis **mencatat transaksinya di HP**.
+Aplikasi Android yang **membaca notifikasi DANA "Pembayaran Masuk"**, **mencatat transaksinya di HP**, dan (kalau dihubungkan) **mengirimnya ke web usaha** seperti Kosinyuk supaya tagihan otomatis Lunas.
 
 Contoh notifikasi yang dicatat:
 
@@ -11,19 +11,25 @@ Contoh notifikasi yang dicatat:
 
 - Total uang masuk **hari ini** dan **bulan ini** (waktu WIB)
 - Daftar transaksi dengan **cari nominal**, label, catatan, dan **filter tanggal**
-- Tiap transaksi bisa diberi **label** (misalnya "Booking R5Y2") dan **catatan**
+- Tiap transaksi bisa diberi **label** (misalnya "K3 · Budi") dan **catatan**
 - **Hapus** catatan transaksi tertentu
 - **Ekspor CSV** lewat lembar Bagikan Android
 - Notifikasi selain "Rp… diterima" (promo, uang keluar, aplikasi lain) **diabaikan dan tidak disimpan**
 - Tetap mencatat walau aplikasi tertutup: service pembaca menyimpan notifikasi ke cache, lalu dimasukkan saat aplikasi dibuka lagi
-- Semua data tersimpan **di HP saja**, tanpa server
+- Tanpa dihubungkan ke web, semua data tersimpan **di HP saja**
+- Kalau dihubungkan ke web usaha (Pengaturan → Hubungkan ke web), uang masuk dikirim mengikuti [Protokol Setor](docs/PROTOKOL-SETOR.md); nominal di luar jalur usaha tetap di HP saja
 
 ## Pasang di HP
 
-1. Unduh dari HP: **https://github.com/Harrakyy/Setor/releases/download/latest/SetorPantau-latest-debug.apk**
-2. Buka file APK-nya, izinkan **"Instal aplikasi tidak dikenal"**, lalu **Instal**.
+1. Unduh APK terbaru dari HP: **https://github.com/Harrakyy/Setor/releases/download/latest/SetorPantau-latest-debug.apk**
+   - Repo ini **privat**: link di atas hanya bisa dibuka setelah **masuk GitHub** di browser HP dengan akun yang punya akses ke repo. Tanpa login hasilnya 404.
+   - Cara lain: buka **https://github.com/Harrakyy/Setor/releases/tag/latest** (sudah login) lalu ketuk **SetorPantau-latest-debug.apk**, atau unduh di laptop lalu kirim ke HP (WhatsApp ke diri sendiri, kabel USB, Google Drive).
+   - APK ini dibuat otomatis oleh GitHub Actions setiap ada push ke `main` (tab **Actions → Android APK**).
+2. Buka file APK-nya, izinkan **"Instal aplikasi tidak dikenal"**, lalu **Instal**. Kalau sudah ada versi lama dengan tanda tangan berbeda, hapus dulu versi lamanya.
 3. Buka SetorPantau → **Pengaturan → Buka pengaturan izin** → aktifkan **SetorPantau** di Akses Notifikasi.
 4. Matikan penghemat baterai: **Setelan → Aplikasi → SetorPantau → Baterai → Tidak dibatasi**. Tanpa ini, Android bisa menghentikan pembaca notifikasi diam-diam.
+
+5. Opsional, hubungkan ke web usaha: di web (mis. Kosinyuk → Pengaturan → **Hubungkan HP**) muncul alamat web + kode 8 karakter. Di Setor: **Pengaturan → Hubungkan ke web**, isi keduanya, lalu **Hubungkan**.
 
 Notifikasi yang masuk **sebelum** izin aktif tidak bisa dibaca.
 
