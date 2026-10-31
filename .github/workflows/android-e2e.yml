@@ -1,0 +1,50 @@
+name: Android E2E (emulator)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build APK debug
+        run: |
+          npm ci
+          npm run build
+          npx cap sync android
+          cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+
+      - name: Aktifkan KVM untuk emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Jalankan E2E di emulator Android 14 (notifikasi sungguhan)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: bash e2e/android.sh
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-screenshot
+          path: e2e-screen.png
+          if-no-files-found: ignore

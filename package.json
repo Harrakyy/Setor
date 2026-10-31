@@ -1,0 +1,24 @@
+{
+  "name": "setorpantau",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "build": "node build.mjs",
+    "dev": "node build.mjs --serve",
+    "android:sync": "npm run build && cap sync android"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
+    "esbuild": "^0.25.12"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/share": "^8.0.3",
+    "capacitor-notifications-listener": "^0.6.1"
+  }
+}

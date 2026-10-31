@@ -1,0 +1,2 @@
+*.sh text eol=lf
+android/gradlew text eol=lf
