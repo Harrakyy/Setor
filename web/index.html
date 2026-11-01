@@ -335,8 +335,12 @@
       </div>
       <div class="card">
         <h3>Data</h3>
-        <p>Catatan transaksi tersimpan di HP ini. Ekspor rutin supaya tidak hilang kalau aplikasi di-uninstall.</p>
+        <p>Catatan transaksi tersimpan di HP ini dan ikut terhapus kalau Setor di-uninstall. Simpan cadangan dulu, lalu pulihkan setelah pasang lagi.</p>
+        <button id="backupSave" class="btn primary" type="button">Simpan cadangan</button>
+        <label class="btn" for="backupFile">Pulihkan dari cadangan</label>
+        <input id="backupFile" type="file" accept="application/json,.json" class="sr-only">
         <button id="exportCsv2" class="btn" type="button">Ekspor semua ke CSV</button>
+        <p class="hint">Cadangan berisi transaksi, label, catatan, dan sumber notifikasi. Usaha terhubung tidak ikut demi keamanan: hubungkan ulang lewat scan QR.</p>
       </div>
     </section>
 

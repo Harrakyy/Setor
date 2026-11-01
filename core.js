@@ -98,3 +98,18 @@ export function toCsv(list) {
   );
   return ["Waktu (WIB),Nominal,Label,Catatan,Teks Notifikasi", ...rows].join("\n") + "\n";
 }
+
+/** File cadangan (JSON) untuk pindah HP / pasang ulang. Token web usaha sengaja tidak ikut: hubungkan ulang lewat QR. */
+export const toBackup = (list, packages) => JSON.stringify({ app: "setor", v: 1, packages, txs: list }, null, 1);
+
+/** Baca file cadangan; data yang bentuknya tidak sesuai dibuang, bukan dipercaya begitu saja. */
+export function fromBackup(text) {
+  const d = JSON.parse(text);
+  if (d?.app !== "setor" || !Array.isArray(d.txs)) throw new Error("Bukan file cadangan Setor.");
+  const str = (v, max) => (typeof v === "string" ? v.slice(0, max) : "");
+  const txs = d.txs
+    .filter((t) => typeof t?.id === "string" && Number.isInteger(t.amount) && t.amount > 0 && Number.isFinite(t.time))
+    .map((t) => ({ id: t.id.slice(0, 600), amount: t.amount, time: t.time, title: str(t.title, 200), text: str(t.text, 600), pkg: str(t.pkg, 100), note: str(t.note, 300), label: str(t.label, 60), ...(t.sync?.state === "sent" ? { sync: t.sync } : {}) }));
+  const packages = Array.isArray(d.packages) ? d.packages.filter((p) => typeof p === "string" && /^[a-zA-Z][\w]*(\.[\w]+)+$/.test(p)) : [];
+  return { txs, packages };
+}

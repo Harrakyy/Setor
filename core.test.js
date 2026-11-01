@@ -99,3 +99,14 @@ test("toCsv: header, waktu WIB, dan teks dengan koma/kutip di-escape", () => {
   assert.equal(head, "Waktu (WIB),Nominal,Label,Catatan,Teks Notifikasi");
   assert.equal(row, '2026-10-31 21:43,1000,"A, B","kata ""tes""",Rp1.000 diterima DANA Bisnis.');
 });
+
+test("cadangan: bolak-balik, buang data rusak, tolak file lain", async () => {
+  const { toBackup, fromBackup, addTx } = await import("./core.js");
+  const tx = { id: "id.dana|1|Rp1.000 diterima", amount: 1000, time: 1, title: "", text: "Rp1.000 diterima", pkg: "id.dana", note: "Budi", label: "K3" };
+  const back = fromBackup(toBackup([tx, { id: "x", amount: -5, time: 2 }], ["id.dana", "bukan paket"]));
+  assert.deepEqual(back.txs, [tx]);
+  assert.deepEqual(back.packages, ["id.dana"]);
+  assert.throws(() => fromBackup('{"hello":1}'), /Bukan file cadangan/);
+  // dipulihkan ke HP yang sudah punya transaksi yang sama: tidak dobel
+  assert.equal(back.txs.reduce(addTx, [tx]).length, 1);
+});

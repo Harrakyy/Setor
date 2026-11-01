@@ -4,7 +4,7 @@ import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import { BarcodeScanner, BarcodeFormat } from "@capacitor-mlkit/barcode-scanning";
 import { NotificationsListener } from "capacitor-notifications-listener";
-import { parseNotification, addTx, updateTx, deleteTx, totals, filterTx, toCsv, wibDate } from "../core.js";
+import { parseNotification, addTx, updateTx, deleteTx, totals, filterTx, toCsv, wibDate, toBackup, fromBackup } from "../core.js";
 import { pendingTx, syncAll, mergeSynced, normalizeServerUrl, notifCopy, targetConn, perBusiness, parsePairQr } from "../sync.js";
 
 // Plugin lokal (android/.../SetorPlugin.java): notifikasi khusus Setor + cek kesehatan HP
@@ -660,18 +660,55 @@ async function exportCsv(list) {
   const name = `Setor-${wibDate(Date.now())}.csv`;
   const csv = toCsv(list);
   try {
-    if (isNative) {
-      const { uri } = await Filesystem.writeFile({ path: name, data: csv, directory: Directory.Cache, encoding: Encoding.UTF8 });
-      await Share.share({ title: name, files: [uri] });
-    } else {
-      const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([csv], { type: "text/csv" })), download: name });
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
+    await saveFile(name, csv, "text/csv");
   } catch (err) {
     if (!/cancel/i.test(String(err?.message))) toast("Gagal mengekspor CSV.");
   }
 }
+
+// ---------- cadangan (pasang ulang / pindah HP) ----------
+async function saveFile(name, data, type) {
+  if (isNative) {
+    const { uri } = await Filesystem.writeFile({ path: name, data, directory: Directory.Cache, encoding: Encoding.UTF8 });
+    await Share.share({ title: name, files: [uri] });
+  } else {
+    const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([data], { type })), download: name });
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+}
+
+$("backupSave").addEventListener("click", async () => {
+  if (!txs.length) return toast("Belum ada transaksi untuk dicadangkan.");
+  try {
+    await saveFile(`Setor-cadangan-${wibDate(Date.now())}.json`, toBackup(txs, packages), "application/json");
+  } catch (err) {
+    if (!/cancel/i.test(String(err?.message))) toast("Gagal menyimpan cadangan.");
+  }
+});
+
+$("backupFile").addEventListener("change", async (e) => {
+  const file = e.target.files?.[0];
+  e.target.value = "";
+  if (!file) return;
+  let data;
+  try {
+    data = fromBackup(await file.text());
+  } catch (err) {
+    return toast(err.message?.startsWith("Bukan") ? err.message : "File cadangan rusak.");
+  }
+  const before = txs.length;
+  txs = data.txs.reduce(addTx, txs);
+  if (data.packages.length) {
+    packages = [...new Set([...packages, ...data.packages])];
+    await Preferences.set({ key: KEY_PKGS, value: JSON.stringify(packages) });
+    $("packages").value = packages.join(", ");
+    if (isNative) await NotificationsListener.replacePackagesWhitelist({ packagesWhitelist: packages }).catch(() => {});
+  }
+  await saveTxs();
+  render();
+  toast(`${txs.length - before} transaksi dipulihkan`);
+});
 
 // ---------- izin & sumber ----------
 async function requestPermission() {

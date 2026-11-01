@@ -19,6 +19,15 @@ android {
     }
     // Kunci tanda tangan dari GitHub Secrets; tanpa kunci, APK rilis tidak bisa dibuat (pakai assembleDebug)
     signingConfigs {
+        // CI menyuntik kunci debug tetap supaya APK baru bisa memperbarui yang lama; lokal tetap pakai ~/.android/debug.keystore
+        debug {
+            if (System.getenv("DEBUG_KEYSTORE_PATH")) {
+                storeFile file(System.getenv("DEBUG_KEYSTORE_PATH"))
+                storePassword "android"
+                keyAlias "androiddebugkey"
+                keyPassword "android"
+            }
+        }
         release {
             if (System.getenv("KEYSTORE_PATH")) {
                 storeFile file(System.getenv("KEYSTORE_PATH"))

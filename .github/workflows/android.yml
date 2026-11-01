@@ -12,6 +12,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SETOR_DEBUG_KEYSTORE: ${{ secrets.SETOR_DEBUG_KEYSTORE }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,14 +30,28 @@ jobs:
       - run: npm run build
       - run: npx cap sync android
 
-      # Gradle membuat ~/.android/debug.keystore acak di tiap runner baru; tanpa cache ini setiap APK
-      # bertanda tangan beda dan Android menolak update ("Aplikasi tidak terinstal").
-      # shortcut: cache hilang kalau 7 hari tanpa build, ganti ke secret keystore sebelum rilis ke pengguna
-      - name: Pakai kunci debug yang sama setiap build
+      # Semua APK harus bertanda tangan kunci yang sama, kalau tidak Android menolak update ("Aplikasi tidak terinstal").
+      # Utama: secret SETOR_DEBUG_KEYSTORE (base64 PKCS12, sandi "android", alias androiddebugkey) → permanen.
+      # Cadangan tanpa secret: kunci dibuat sekali lalu disimpan di cache.
+      # shortcut: cache GitHub terhapus kalau 7 hari tanpa build, isi secret supaya tidak bergantung cache
+      - name: Ambil kunci debug dari cache (kalau secret belum diisi)
+        if: env.SETOR_DEBUG_KEYSTORE == ''
         uses: actions/cache@v4
         with:
-          path: ~/.android/debug.keystore
-          key: setor-debug-keystore-v1
+          path: ~/setor-debug.p12
+          key: setor-debug-keystore-v2
+      - name: Siapkan kunci debug tetap
+        run: |
+          K="$HOME/setor-debug.p12"
+          if [ -n "$SETOR_DEBUG_KEYSTORE" ]; then
+            echo "$SETOR_DEBUG_KEYSTORE" | base64 -d > "$K"
+          elif [ ! -f "$K" ]; then
+            keytool -genkeypair -keystore "$K" -storetype PKCS12 -storepass android -keypass android \
+              -alias androiddebugkey -dname "CN=Setor Debug" -keyalg RSA -keysize 2048 -validity 10000
+            echo "::warning::Kunci debug baru dibuat (secret SETOR_DEBUG_KEYSTORE belum diisi). APK lama perlu di-uninstall sekali."
+          fi
+          echo "DEBUG_KEYSTORE_PATH=$K" >> "$GITHUB_ENV"
+          keytool -list -keystore "$K" -storepass android | grep -i fingerprint
 
       - name: Versi dari tag (v1.2.3 → 1.2.3)
         run: |
