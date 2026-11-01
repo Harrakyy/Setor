@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.json.JSONArray;
 import org.junit.Test;
 
 public class SetorNotifierTest {
@@ -32,5 +33,14 @@ public class SetorNotifierTest {
     @Test
     public void rupiah_titikRibuan() {
         assertEquals("Rp799.873", SetorNotifier.rupiah(799873));
+    }
+
+    @Test
+    public void target_samaDenganSyncJs() throws Exception {
+        JSONArray conns = new JSONArray("[{\"url\":\"https://atm\"},{\"url\":\"https://kos\",\"band\":{\"min\":500,\"max\":999}}]");
+        assertEquals("https://kos", SetorNotifier.target(conns, 800512).optString("url"));
+        assertEquals("https://atm", SetorNotifier.target(conns, 35017).optString("url"));
+        JSONArray kosOnly = new JSONArray("[{\"url\":\"https://kos\",\"band\":{\"min\":500,\"max\":999}}]");
+        assertEquals(null, SetorNotifier.target(kosOnly, 35017));
     }
 }

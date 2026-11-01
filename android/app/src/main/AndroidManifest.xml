@@ -44,6 +44,8 @@
             </intent-filter>
         </service>
 
+        <!-- Pemindai QR pairing (Google code scanner, tanpa izin kamera) diunduh saat install -->
+        <meta-data android:name="com.google.mlkit.vision.DEPENDENCIES" android:value="barcode_ui" />
     </application>
 
     <!-- Permissions -->

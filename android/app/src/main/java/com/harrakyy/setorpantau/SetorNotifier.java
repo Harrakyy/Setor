@@ -15,6 +15,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.OutputStream;
@@ -59,6 +60,22 @@ final class SetorNotifier {
     static boolean inBand(long amount, int min, int max) {
         long last3 = amount % 1000;
         return last3 >= min && last3 <= max;
+    }
+
+    /** Sama dengan targetConn di sync.js: usaha yang jalurnya cocok, lalu web tanpa jalur, atau null (tetap di HP). */
+    static JSONObject target(JSONArray conns, long amount) {
+        JSONObject fallback = null;
+        for (int i = 0; conns != null && i < conns.length(); i++) {
+            JSONObject c = conns.optJSONObject(i);
+            if (c == null) continue;
+            JSONObject band = c.optJSONObject("band");
+            if (band == null) {
+                if (fallback == null) fallback = c;
+            } else if (inBand(amount, band.optInt("min"), band.optInt("max"))) {
+                return c;
+            }
+        }
+        return fallback;
     }
 
     static String rupiah(long amount) {

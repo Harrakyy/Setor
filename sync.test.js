@@ -107,3 +107,36 @@ test("notifCopy: kalimat notifikasi mengikuti status kirim", async () => {
   assert.equal(notifCopy({ ...t, sync: { state: "sent", result: "unmatched", label: null } }, kos).text, "Belum cocok dengan tagihan · cek di Kos Melati");
   assert.equal(notifCopy({ ...t, sync: { state: "sent", result: "duplicate", label: null } }, kos).text, "Sudah tercatat di Kos Melati");
 });
+
+
+test("targetConn & pendingTx: banyak usaha, uang dikirim ke pemilik jalurnya", async () => {
+  const { targetConn } = await import("./sync.js");
+  const kos = { url: "https://kosinyuk.id", token: "a", pairedAt: PAIRED, band: { min: 500, max: 999 } };
+  const cafe = { url: "https://atmosphere.cafe", token: "b", pairedAt: PAIRED, band: null };
+  const conns = [kos, cafe];
+  const list = [tx("k", 5, { amount: 799873 }), tx("c", 6, { amount: 120350 })];
+  assert.equal(targetConn(list[0], conns), kos);
+  assert.equal(targetConn(list[1], conns), cafe); // web lama tanpa jalur menampung sisanya
+  assert.deepEqual(pendingTx(list, kos, conns).map((t) => t.id), ["k"]);
+  assert.deepEqual(pendingTx(list, cafe, conns).map((t) => t.id), ["c"]);
+  assert.equal(targetConn(list[1], [kos]), null); // hanya Kosinyuk: 120.350 tetap di HP
+});
+
+test("syncAll mencatat tujuan kirim; perBusiness mengelompokkan per usaha", async () => {
+  const { perBusiness } = await import("./sync.js");
+  const kos = { url: "https://kosinyuk.id", business: "Kos Melati", token: "a", pairedAt: PAIRED, band: { min: 500, max: 999 } };
+  const out = await syncAll([tx("k", 5, { amount: 799873 }), tx("p", 6, { amount: 50000 })], kos, async () => ({
+    status: 200, data: { success: true, data: { result: "matched", label: "K3 · Budi" } },
+  }), PAIRED + HOUR, [kos]);
+  assert.equal(out.list.find((t) => t.id === "k").sync.to, "https://kosinyuk.id");
+  const groups = perBusiness(out.list, [kos], () => true);
+  assert.deepEqual(groups.map((g) => [g.name, g.sum, g.count]), [["Kos Melati", 799873, 1], ["Di HP saja", 50000, 1]]);
+});
+
+test("parsePairQr: QR Kosinyuk → alamat + kode; QR lain ditolak", async () => {
+  const { parsePairQr } = await import("./sync.js");
+  assert.deepEqual(parsePairQr("https://kosinyuk.id/setor/pair?c=k7q2-m9xa"), { url: "https://kosinyuk.id", code: "K7Q2M9XA" });
+  assert.equal(parsePairQr("00020101021126570011ID.DANA.WWW"), null);
+  assert.equal(parsePairQr("http://kosinyuk.id/setor/pair?c=K7Q2M9XA"), null); // bukan https
+  assert.equal(parsePairQr("https://kosinyuk.id/"), null);
+});

@@ -19,7 +19,8 @@ public class SetorApp extends Application {
     // Nama grup & kunci milik capacitor-notifications-listener (SimpleStorage default) dan Capacitor Preferences
     private static final String PREFS = "CapacitorStorage";
     private static final String CACHE_KEY = "notificationsCache";
-    private static final String CONN_KEY = "setorpantau.conn";
+    private static final String CONNS_KEY = "setorpantau.conns"; // ditulis app.js
+    private static final String CONN_KEY_OLD = "setorpantau.conn"; // versi satu usaha, sebelum app dibuka & dimigrasi
     private static final String HANDLED = "setor.native.handled";
     private static final int HANDLED_MAX = 200;
 
@@ -48,10 +49,12 @@ public class SetorApp extends Application {
         }
         SharedPreferences own = getSharedPreferences(HANDLED, MODE_PRIVATE);
         Set<String> handled = new HashSet<>(own.getStringSet("ids", new HashSet<>()));
-        JSONObject conn = null;
+        JSONArray conns = new JSONArray();
         try {
-            String c = prefs.getString(CONN_KEY, null);
-            if (c != null) conn = new JSONObject(c);
+            String c = prefs.getString(CONNS_KEY, null);
+            String old = prefs.getString(CONN_KEY_OLD, null);
+            if (c != null) conns = new JSONArray(c);
+            else if (old != null) conns.put(new JSONObject(old));
         } catch (Exception ignored) {
         }
         for (int i = 0; i < cached.length(); i++) {
@@ -63,11 +66,12 @@ public class SetorApp extends Application {
             long time = n.optLong("time", System.currentTimeMillis());
             String id = SetorNotifier.notifId(n.optString("package"), time, text);
             if (!handled.add(id)) continue;
+            JSONObject conn = SetorNotifier.target(conns, amount);
             if (conn == null) {
-                SetorNotifier.show(this, id, SetorNotifier.rupiah(amount) + " masuk", "DANA · tercatat di HP");
+                SetorNotifier.show(this, id, SetorNotifier.rupiah(amount) + " masuk",
+                        conns.length() == 0 ? "DANA · tercatat di HP" : "DANA · di luar jalur usaha, disimpan di HP saja");
             } else {
-                final JSONObject c = conn;
-                new Thread(() -> SetorNotifier.deliver(this, c, id, amount, time, text)).start();
+                new Thread(() -> SetorNotifier.deliver(this, conn, id, amount, time, text)).start();
             }
         }
         // shortcut: simpan id terakhir secukupnya (set tak berurutan), cukup karena cache plugin dikosongkan saat app dibuka

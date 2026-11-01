@@ -19,11 +19,14 @@ Kode dibuat di halaman pengaturan web, 8 karakter, sekali pakai, berlaku 10 meni
   "token": "…",                                  // simpan di HP, kirim sebagai Bearer
   "device": { "id": "…", "name": "Samsung A15" },
   "business": { "name": "Kos Melati", "type": "kos" },
-  "band": { "min": 500, "max": 999 }             // opsional, lihat §3
+  "band": { "min": 500, "max": 999 },            // opsional, lihat §3
+  "dashboard": "https://kosinyuk.id/tagihan"     // opsional: tombol "Buka dashboard" di Setor
 }
 ```
 
 Web menyimpan **hash** token, bukan tokennya.
+
+QR pairing berisi `https://{web}/setor/pair?c=K7Q2M9XA`. Setor membaca alamat dan kodenya dari QR itu; dipindai kamera biasa, halaman itu menawarkan unduhan Setor.
 
 ## 2. Uang masuk
 
@@ -50,6 +53,24 @@ Satu DANA bisa dipakai beberapa usaha. Supaya nominal dua usaha tidak pernah sam
 
 Web memilih kode unik supaya nominal akhir jatuh di jalurnya, dan mengirim `band` saat pairing. Setor hanya mengirim nominal yang masuk jalur usaha itu; nominal lain (misalnya transfer pribadi Rp50.000) tetap di HP saja. Web yang tidak mengirim `band` menerima semua nominal.
 
+Satu HP bisa terhubung ke beberapa usaha sekaligus; setiap uang masuk dikirim ke satu usaha saja menurut jalurnya (yang `band`-nya cocok, kalau tidak ada: web tanpa `band`).
+
+## 4. Ringkasan & pengingat (opsional)
+
+`POST {web}/api/devices/summary` dengan header Bearer, body `{}`. Dipanggil saat Setor dibuka dan tiap 10 menit selama terbuka; sekaligus menjadi heartbeat (web mencatat `lastSeenAt`).
+
+```json
+{
+  "business": { "name": "Kos Melati", "type": "kos" },
+  "dashboard": "https://kosinyuk.id/tagihan",
+  "items": [
+    { "id": "…", "title": "Sari · K5", "detail": "Rp800.731 · jatuh tempo 10 Nov", "action": { "text": "WA", "url": "https://wa.me/62…?text=…" } }
+  ]
+}
+```
+
+Setor menampilkan `items` di kotak Notifikasi dengan tombol `action` (hanya URL https). Web tanpa endpoint ini (404) dilewati.
+
 ## Belum ada
 
-- Heartbeat (deteksi HP mati), HMAC + timestamp di atas Bearer, notifikasi aksi dari web ke Setor, sumber selain DANA.
+- HMAC + timestamp di atas Bearer, notifikasi aksi dari web ke Setor, sumber selain DANA.

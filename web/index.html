@@ -97,7 +97,7 @@
     .notice.ok { background: var(--tint); color: var(--royal); }
     .notice b { font-size: 14px; }
     .hrow { display: flex; align-items: center; gap: 12px; }
-    .hrow .dot { width: 30px; height: 30px; flex: none; border-radius: 15px; display: grid; place-items: center; font-size: 14px; font-weight: 800; }
+    .hrow .dot, .reminder .dot { width: 30px; height: 30px; flex: none; border-radius: 15px; display: grid; place-items: center; font-size: 14px; font-weight: 800; }
     .dot.ok { background: var(--tint); color: var(--royal); }
     .dot.warn { background: var(--warnbg); color: var(--warn); }
     .hrow .ht { flex: 1; font-size: 14px; }
@@ -113,12 +113,81 @@
     .tab[aria-selected="true"] { background: var(--ink); color: #fff; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    dialog { border: 0; border-radius: 32px 32px 0 0; padding: 0; margin: auto auto 0; width: min(560px, 100%); max-width: 100%; box-shadow: 0 -12px 40px rgba(15,23,42,.25); background: #fff; }
+    dialog { max-height: 92vh; overflow-y: auto; border: 0; border-radius: 32px 32px 0 0; padding: 0; margin: auto auto 0; width: min(560px, 100%); max-width: 100%; box-shadow: 0 -12px 40px rgba(15,23,42,.25); background: #fff; }
     dialog::backdrop { background: rgba(10,26,71,.55); }
     .sheet { padding: 14px 20px calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
     .sheet::before { content: ""; align-self: center; width: 44px; height: 5px; border-radius: 3px; background: #cbd5e1; }
     .sheet .big { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
     .sheet .raw { font-size: 13px; color: #334155; background: var(--mist); border-radius: 16px; padding: 10px 12px; }
+    /* Header standar: tinggi tetap (aturan konsistensi), hero besar hanya untuk layar berangka besar */
+    .hero-std { min-height: calc(120px + env(safe-area-inset-top)); box-sizing: border-box; padding-bottom: 20px; justify-content: flex-end; border-radius: 0 0 28px 28px; }
+    .hero-tall { padding-bottom: 32px; }
+    .stack { display: flex; flex-direction: column; gap: 10px; }
+    .lead { margin: 0 2px; font-size: 14px; color: var(--muted); line-height: 1.5; }
+    .hint { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .badge { position: absolute; top: 6px; right: 6px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #9cc0ff; color: var(--navy); font-size: 11px; font-weight: 800; display: grid; place-items: center; }
+    .round { position: relative; }
+    .reminder { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border: 0; border-radius: 20px; background: var(--warnbg); color: var(--warn); text-align: left; cursor: pointer; font-size: 14px; }
+    .reminder b { display: block; font-size: 15px; }
+    .ucard { background: var(--card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .ucard .uhead { display: flex; align-items: center; gap: 12px; }
+    .ucard .ui { width: 46px; height: 46px; border-radius: 15px; background: var(--royal); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; flex: none; }
+    .ucard .un { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .ucard .un b { font-size: 16px; }
+    .ucard .un span { font-size: 12px; color: var(--muted); }
+    .ustats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .ustats div { background: var(--mist); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 2px; }
+    .ustats span { font-size: 11px; color: #475569; }
+    .ustats b { font-size: 14px; }
+    .jrow { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--mist); font-size: 14px; }
+    .jrow b { width: 76px; color: var(--royal); font-size: 13px; }
+    .jrow span { flex: 1; font-weight: 600; }
+    .bubbles { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; min-height: 260px; }
+    .bubble { border-radius: 50%; background: rgba(255,255,255,.12); border: 3px solid rgba(255,255,255,.18); border-top-color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 8px; box-sizing: border-box; color: #fff; }
+    .bubble b { font-size: 18px; }
+    .bubble span { font-size: 12px; opacity: .85; }
+    .bubble.local { border-style: dashed; border-color: rgba(255,255,255,.4); }
+    a.btn { text-decoration: none; }
+    .btn svg { width: 20px; height: 20px; flex: none; }
+    .card .big-amt, .big-amt { margin: 0; color: var(--ink); font-size: 36px; font-weight: 700; letter-spacing: -1.2px; text-align: center; font-variant-numeric: tabular-nums; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .stats div { background: var(--mist); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 2px; }
+    .stats span { font-size: 12px; color: #475569; }
+    .stats b { font-size: 18px; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chipbtn { min-height: 38px; padding: 0 14px; border-radius: 999px; border: 0; background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .chipbtn[aria-selected="true"] { background: var(--ink); color: #fff; font-weight: 700; }
+    .ev { display: flex; gap: 12px; padding: 14px; border-radius: 20px; background: #fff; }
+    .ev.act { box-shadow: inset 4px 0 0 var(--warn); }
+    .ev .ei { width: 40px; height: 40px; flex: none; border-radius: 13px; background: var(--royal); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 800; }
+    .ev .eb { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .ev .em { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: #475569; }
+    .ev .et { font-size: 15px; font-weight: 700; }
+    .ev .ed { font-size: 13px; color: #334155; }
+    .ev .btn { align-self: flex-start; min-height: 36px; padding: 0 14px; font-size: 13px; margin-top: 4px; }
+    .divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
+    .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #e2e8f0; }
+    .onboard { position: fixed; inset: 0; z-index: 60; background: var(--hero); color: #fff; display: flex; flex-direction: column; gap: 16px; padding: calc(24px + env(safe-area-inset-top)) 24px calc(28px + env(safe-area-inset-bottom)); overflow-y: auto; }
+    .onboard h1 { margin: 12px 0 0; font-size: 32px; font-weight: 700; letter-spacing: -.8px; line-height: 1.1; }
+    .onboard p { margin: 0; font-size: 15px; line-height: 1.5; color: rgba(255,255,255,.88); }
+    .ob-top { display: flex; justify-content: space-between; align-items: center; }
+    .ob-dots { display: flex; gap: 6px; }
+    .ob-dots i { width: 22px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.3); transition: background-color .3s var(--ease); }
+    .ob-dots i.on { background: #fff; }
+    .ob-skip, .ob-link { border: 0; background: transparent; color: rgba(255,255,255,.88); font-weight: 600; min-height: 44px; cursor: pointer; }
+    .ob-visual { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+    .ob-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 20px; background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.24); }
+    .ob-card .oi { width: 38px; height: 38px; border-radius: 12px; background: #fff; color: var(--royal); display: grid; place-items: center; font-size: 10px; font-weight: 800; flex: none; }
+    .ob-card div { display: flex; flex-direction: column; font-size: 13px; }
+    .ob-card b { font-size: 15px; }
+    .ob-list { padding: 16px; border-radius: 22px; background: #fff; color: var(--ink); display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+    .ob-actions { display: flex; flex-direction: column; gap: 6px; }
+    .ob-primary { background: #fff; border: 0; color: var(--ink); min-height: 56px; font-size: 16px; }
+    .ob-visual > * { animation: rise .45s var(--ease) both; }
+    .ob-visual > *:nth-child(2) { animation-delay: .08s; }
+    .ob-visual > *:nth-child(3) { animation-delay: .16s; }
+    .bubble { animation: pop .45s var(--ease) both; }
+
     /* ---------- Gerak: cepat & halus, hanya transform/opacity supaya mulus di HP murah ---------- */
     .hero-amt, .amt, .summary b, .hero-pill b { font-variant-numeric: tabular-nums; }
     .btn, .pill, .tab, .round, .tx, .glass { transition: transform .12s var(--ease), background-color .2s var(--ease), color .2s var(--ease); }
@@ -146,14 +215,18 @@
     <!-- Beranda -->
     <section id="view-home" role="tabpanel" aria-labelledby="tab-home">
       <header class="hero">
-        <div class="brand"><img src="./icon-192.png" alt=""><span>Setor</span></div>
+        <div class="hero-row">
+          <div class="brand"><img src="./icon-192.png" alt=""><span>Setor</span></div>
+          <button id="openInbox" class="round" type="button" aria-label="Notifikasi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span id="inboxBadge" class="badge hidden"></span></button>
+        </div>
         <div class="hero-center">
           <p class="hero-label" id="monthLabel">Uang masuk bulan ini</p>
           <p class="hero-amt" id="monthSum">Rp 0</p>
           <p class="hero-pill"><span id="monthCount">0 transaksi</span> · hari ini <b id="todaySum">Rp 0</b> (<span id="todayCount">0 transaksi</span>)</p>
         </div>
-        <button id="homeConn" class="glass" type="button"></button>
+        <div id="homeUsaha" class="stack"></div>
       </header>
+      <button id="homeReminder" class="reminder hidden" type="button"></button>
       <div id="permWarn" class="notice warn hidden" role="alert"></div>
       <div id="previewNote" class="notice warn hidden">
         <b>Mode pratinjau (browser)</b>
@@ -176,11 +249,11 @@
           <button id="exportCsv" class="round" type="button" aria-label="Ekspor CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
         </div>
         <div class="summary"><span id="filterCount">0 transaksi</span><span>Total <b id="filterSum">Rp 0</b></span></div>
-      <label class="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <span class="sr-only">Cari transaksi</span>
-        <input id="q" type="search" inputmode="search" placeholder="Cari nominal, label, catatan…" autocomplete="off">
-      </label>
+        <label class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="sr-only">Cari transaksi</span>
+          <input id="q" type="search" inputmode="search" placeholder="Cari nominal, label, catatan…" autocomplete="off">
+        </label>
       </header>
       <details class="filter">
         <summary>Filter tanggal</summary>
@@ -195,9 +268,43 @@
       <div id="txList" class="list"></div>
     </section>
 
+    <!-- Ringkasan per usaha -->
+    <section id="view-sum" role="tabpanel" aria-labelledby="tab-sum" class="hidden">
+      <header class="hero hero-tall">
+        <div class="hero-row"><h1 id="sumTitle">Ringkasan</h1></div>
+        <div id="bubbles" class="bubbles"></div>
+      </header>
+      <div class="card">
+        <h3>Uang masuk</h3>
+        <p class="big-amt" id="sumTotal">Rp 0</p>
+        <div class="stats">
+          <div><span>Cocok otomatis</span><b id="sumMatched">0</b></div>
+          <div><span>Belum cocok</span><b id="sumUnmatched">0</b></div>
+          <div><span>Di HP saja</span><b id="sumLocal">0</b></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Usaha terhubung -->
+    <section id="view-usaha" role="tabpanel" aria-labelledby="tab-usaha" class="hidden">
+      <header class="hero hero-std">
+        <div class="hero-row">
+          <h1>Usaha terhubung</h1>
+          <button id="addUsaha" class="round" type="button" aria-label="Hubungkan usaha baru"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </header>
+      <p class="lead">Satu HP, satu DANA, banyak usaha. Setiap uang masuk dikirim ke usaha yang punya jalur nominalnya.</p>
+      <div id="usahaList" class="stack"></div>
+      <div class="card">
+        <h3>Jalur pengiriman</h3>
+        <p>Setor melihat 3 digit terakhir nominal, lalu mengirim hanya ke usaha pemilik jalurnya.</p>
+        <div id="jalurList" class="stack"></div>
+      </div>
+    </section>
+
     <!-- Pengaturan -->
     <section id="view-settings" role="tabpanel" aria-labelledby="tab-settings" class="hidden">
-      <header class="hero"><h1>Pengaturan</h1><p class="hero-label" style="text-align:left">Izin notifikasi, koneksi ke web usaha, dan data.</p></header>
+      <header class="hero hero-std"><div class="hero-row"><h1>Pengaturan</h1></div></header>
       <div class="card">
         <h3>Kesehatan HP</h3>
         <p>Supaya setiap uang masuk tercatat dan dikirim walau Setor tidak dibuka.</p>
@@ -215,23 +322,7 @@
           <li>Matikan penghemat baterai: <b>Setelan → Aplikasi → Setor → Baterai → Tidak dibatasi</b>. Tanpa ini Android bisa menghentikan pembaca notifikasi diam-diam.</li>
           <li>Notifikasi yang masuk <b>sebelum</b> izin aktif tidak bisa dibaca.</li>
         </ol>
-      </div>
-      <div class="card">
-        <h3>Hubungkan ke web</h3>
-        <p>Pembayaran yang tercatat otomatis dikirim ke web usahamu (misalnya Kosinyuk), lalu tagihan dengan nominal yang cocok langsung jadi <b>Lunas</b>.</p>
-        <div id="connForm" style="display:flex;flex-direction:column;gap:10px">
-          <div class="field"><label for="connUrl">Alamat web</label><input id="connUrl" class="input" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://kosinyuk.id"></div>
-          <div class="field"><label for="connCode">Kode pairing (dari web usaha → Pengaturan → Hubungkan HP)</label><input id="connCode" class="input" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="8 karakter"></div>
-          <div class="field"><label for="connName">Nama HP ini</label><input id="connName" class="input" maxlength="40" value="HP Setor"></div>
-          <button id="connPair" class="btn primary" type="button">Hubungkan</button>
-        </div>
-        <div id="connInfo" class="hidden" style="display:flex;flex-direction:column;gap:10px">
-          <div id="connStatus" class="notice ok"></div>
-          <div class="row">
-            <button id="connRetry" class="btn" type="button">Kirim ulang sekarang</button>
-            <button id="connDisconnect" class="btn danger" type="button">Putuskan</button>
-          </div>
-        </div>
+        <button id="reOnboard" class="btn" type="button">Lihat panduan awal lagi</button>
       </div>
       <div class="card">
         <h3>Sumber notifikasi</h3>
@@ -248,15 +339,50 @@
         <button id="exportCsv2" class="btn" type="button">Ekspor semua ke CSV</button>
       </div>
     </section>
+
+    <!-- Kotak notifikasi (dibuka dari lonceng Beranda) -->
+    <section id="view-inbox" class="hidden" aria-label="Notifikasi">
+      <header class="hero hero-std">
+        <div class="hero-row">
+          <button id="closeInbox" class="round" type="button" aria-label="Kembali"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+          <h1 style="flex:1">Notifikasi</h1>
+        </div>
+      </header>
+      <div class="chips" role="tablist" aria-label="Saring notifikasi">
+        <button class="chipbtn" role="tab" data-f="all" aria-selected="true">Semua</button>
+        <button class="chipbtn" role="tab" data-f="act" aria-selected="false">Perlu tindakan</button>
+        <button class="chipbtn" role="tab" data-f="ok" aria-selected="false">Lunas</button>
+      </div>
+      <div id="inboxList" class="stack"></div>
+    </section>
   </main>
 
   <div class="dock">
     <nav class="tabs" role="tablist" aria-label="Menu">
       <button class="tab" role="tab" data-tab="home" id="tab-home" aria-label="Beranda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/></svg></button>
       <button class="tab" role="tab" data-tab="tx" id="tab-tx" aria-label="Transaksi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4"/></svg></button>
-      <button class="tab" role="tab" data-tab="settings" id="tab-settings" aria-label="Pengaturan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></button>
+      <button class="tab" role="tab" data-tab="sum" id="tab-sum" aria-label="Ringkasan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg></button>
+      <button class="tab" role="tab" data-tab="usaha" id="tab-usaha" aria-label="Usaha terhubung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10l1.5-5h13L20 10M4 10v9h16v-9M4 10h16M9 19v-5h6v5"/></svg></button>
+      <button class="tab" role="tab" data-tab="settings" id="tab-settings" aria-label="Pengaturan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/></svg></button>
     </nav>
   </div>
+
+  <!-- Hubungkan usaha: scan QR dari web usaha, atau ketik alamat + kode -->
+  <dialog id="pairSheet" aria-labelledby="pairTitle">
+    <form method="dialog" class="sheet">
+      <div class="big" id="pairTitle" style="font-size:24px">Hubungkan usaha</div>
+      <button id="scanQr" class="btn primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4M4 12h16"/></svg>Scan QR dari web usaha</button>
+      <p class="hint">Kosinyuk: Pengaturan → Hubungkan HP. Atmosphere: Admin → Pengaturan → Buat kode pairing.</p>
+      <div class="divider"><span>atau ketik manual</span></div>
+      <div class="field"><label for="connUrl">Alamat web</label><input id="connUrl" class="input" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://kosinyuk.id"></div>
+      <div class="field"><label for="connCode">Kode pairing (8 karakter)</label><input id="connCode" class="input" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="K7Q2-M9XA"></div>
+      <div class="field"><label for="connName">Nama HP ini</label><input id="connName" class="input" maxlength="40" value="HP Setor"></div>
+      <div class="row">
+        <button class="btn" value="cancel" formnovalidate>Batal</button>
+        <button id="connPair" class="btn primary" type="button">Hubungkan</button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog id="detail" aria-labelledby="detailAmount">
     <form method="dialog" class="sheet" id="detailForm">
@@ -266,9 +392,9 @@
       </div>
       <div class="raw" id="detailRaw"></div>
       <div class="raw hidden" id="detailSync"></div>
+      <div class="stack hidden" id="detailForward"></div>
       <div class="field"><label for="detailLabel">Label</label><input id="detailLabel" class="input" maxlength="60" placeholder="Contoh: K3 · Budi"></div>
       <div class="field"><label for="detailNote">Catatan</label><textarea id="detailNote" class="input" maxlength="300" placeholder="Contoh: bayar lewat adiknya"></textarea></div>
-      <button class="btn primary hidden" type="button" id="detailForward">Teruskan ke web</button>
       <div class="row">
         <button class="btn danger" type="button" id="detailDelete">Hapus</button>
         <button class="btn" value="cancel" formnovalidate>Tutup</button>
@@ -276,6 +402,21 @@
       </div>
     </form>
   </dialog>
+
+  <!-- Panduan awal: pembuka + izin baca notif + izin tampilkan notif + baterai -->
+  <div id="onboard" class="onboard hidden" role="dialog" aria-modal="true" aria-labelledby="obTitle">
+    <div class="ob-top">
+      <div class="ob-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <button id="obSkip" class="ob-skip" type="button">Lewati</button>
+    </div>
+    <h1 id="obTitle"></h1>
+    <p id="obText"></p>
+    <div id="obVisual" class="ob-visual"></div>
+    <div class="ob-actions">
+      <button id="obPrimary" class="btn ob-primary" type="button"></button>
+      <button id="obNext" class="ob-link" type="button">Lanjut</button>
+    </div>
+  </div>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
   <script type="module" src="./app.js"></script>
