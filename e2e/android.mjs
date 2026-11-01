@@ -77,6 +77,11 @@ try {
   await sleep(4000);
   let s = await state();
   check(s.rows.includes("Rp 1.000") && s.today === "Rp 1.000", "Aplikasi terbuka: notif Rp1.000 tercatat & total hari ini Rp 1.000", JSON.stringify(s));
+  if (!s.rows.includes("Rp 1.000")) {
+    // Diagnostik: apakah notif masuk cache (WebView dianggap tidak aktif) atau JS gagal memprosesnya
+    const log = adb("logcat -d -v brief NotificationService:D NotificationsListenerPlugin:D Capacitor/Console:* Capacitor:E *:S").split("\n").slice(-40).join(" ⏎ ");
+    console.log(`::warning title=logcat::${log}`);
+  }
 
   // 3. Notif promo/lainnya harus diabaikan
   postNotif("promo1", "Promo 11.11!", "Cashback Rp10.000 untukmu");
