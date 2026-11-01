@@ -17,7 +17,10 @@ Contoh notifikasi yang dicatat:
 - Notifikasi selain "Rp… diterima" (promo, uang keluar, aplikasi lain) **diabaikan dan tidak disimpan**
 - Tetap mencatat walau aplikasi tertutup: service pembaca menyimpan notifikasi ke cache, lalu dimasukkan saat aplikasi dibuka lagi
 - Tanpa dihubungkan ke web, semua data tersimpan **di HP saja**
-- Kalau dihubungkan ke web usaha (Pengaturan → Hubungkan ke web), uang masuk dikirim mengikuti [Protokol Setor](docs/PROTOKOL-SETOR.md); nominal di luar jalur usaha tetap di HP saja
+- **Banyak usaha sekaligus** (tab Usaha → +): hubungkan lewat **scan QR** dari web usaha atau ketik alamat + kode. Uang masuk dikirim ke usaha pemilik jalur 3 digitnya ([Protokol Setor](docs/PROTOKOL-SETOR.md)); nominal di luar jalur tetap di HP saja
+- **Notifikasi Setor** dengan bunyi khas walau aplikasi tertutup: "✅ K3 · Budi lunas"
+- **Ringkasan** bulan ini per usaha, **kotak Notifikasi** (hasil kirim + tagihan belum lunas dengan tombol pengingat WA)
+- **Panduan awal** 4 langkah (izin baca notifikasi, izin tampilkan notifikasi, baterai) dan **Kesehatan HP** di Pengaturan
 
 ## Pasang di HP
 
