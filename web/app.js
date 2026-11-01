@@ -1,10 +1,13 @@
-import { Capacitor, CapacitorHttp } from "@capacitor/core";
+import { Capacitor, CapacitorHttp, registerPlugin } from "@capacitor/core";
 import { Preferences } from "@capacitor/preferences";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import { NotificationsListener } from "capacitor-notifications-listener";
 import { parseNotification, addTx, updateTx, deleteTx, totals, filterTx, toCsv, wibDate } from "../core.js";
-import { pendingTx, syncAll, mergeSynced, normalizeServerUrl } from "../sync.js";
+import { pendingTx, syncAll, mergeSynced, normalizeServerUrl, notifCopy, inBand } from "../sync.js";
+
+// Plugin lokal (android/.../SetorPlugin.java): notifikasi khusus Setor + cek kesehatan HP
+const SetorNative = registerPlugin("Setor");
 
 const isNative = Capacitor.isNativePlatform();
 const KEY_TX = "setorpantau.tx";
@@ -48,6 +51,9 @@ async function load() {
 
 const saveTxs = () => Preferences.set({ key: KEY_TX, value: JSON.stringify(txs) });
 
+// Notifikasi Setor untuk satu transaksi; key sama = memperbarui notif lama tanpa bunyi ulang
+const notify = (t) => isNative && SetorNative.notify({ key: t.id, ...notifCopy(t, conn) }).catch(() => {});
+
 // ---------- notifikasi ----------
 async function onNotification(n) {
   const tx = parseNotification(n, packages);
@@ -58,6 +64,8 @@ async function onNotification(n) {
   await saveTxs();
   render();
   toast(`${rupiah(tx.amount)} masuk tercatat`);
+  // Notif lama dari cache (app sempat tertutup) sudah dinotifikasi native; jangan bunyi lagi
+  if (Date.now() - tx.time < 2 * 60_000) notify(tx);
   syncNow();
 }
 
@@ -82,7 +90,9 @@ async function syncNow() {
     const { list, revoked } = await syncAll(txs, conn, (payload) =>
       postJson(`${conn.url}/api/payments/qris/notification`, payload, conn.token)
     );
+    const before = new Map(txs.map((t) => [t.id, t.sync]));
     txs = mergeSynced(txs, list);
+    for (const t of txs) if (t.sync && t.sync !== before.get(t.id)) notify(t);
     await saveTxs();
     if (revoked) {
       conn = null;
@@ -169,6 +179,38 @@ async function startListener() {
   await NotificationsListener.restoreCachedNotifications();
 }
 
+// Panduan per merek: HP yang paling sering mematikan aplikasi di latar belakang
+const BRAND_TIPS = {
+  xiaomi: "Xiaomi/Redmi/POCO: Setelan → Aplikasi → Setor → Mulai otomatis aktif, lalu Penghemat baterai → Tanpa batasan.",
+  oppo: "Oppo/Realme/OnePlus: Setelan → Baterai → Setor → izinkan aktivitas latar belakang dan mulai otomatis.",
+  vivo: "Vivo: Setelan → Baterai → Konsumsi daya latar belakang tinggi → aktifkan Setor.",
+  samsung: "Samsung: Setelan → Baterai → Batas penggunaan latar belakang → pastikan Setor tidak masuk daftar aplikasi tidur.",
+};
+for (const [alias, key] of [["redmi", "xiaomi"], ["poco", "xiaomi"], ["realme", "oppo"], ["oneplus", "oppo"]]) BRAND_TIPS[alias] = BRAND_TIPS[key];
+
+function healthRow(id, ok, text) {
+  const row = $(id);
+  row.querySelector(".dot").className = `dot ${ok ? "ok" : "warn"}`;
+  row.querySelector(".dot").textContent = ok ? "✓" : "!";
+  row.querySelector(".ht").textContent = text;
+  row.querySelector("button")?.classList.toggle("hidden", ok);
+}
+
+async function renderHealth() {
+  if (!isNative) {
+    for (const id of ["hAccess", "hPost", "hBattery"]) healthRow(id, true, "Hanya diperiksa di aplikasi Android");
+    return;
+  }
+  let h = { notify: true, battery: true, brand: "" };
+  try { h = await SetorNative.health(); } catch {}
+  healthRow("hAccess", listening, listening ? "Akses notifikasi aktif" : "Akses notifikasi belum aktif");
+  healthRow("hPost", h.notify, h.notify ? "Setor boleh menampilkan notifikasi" : "Notifikasi Setor dimatikan");
+  healthRow("hBattery", h.battery, h.battery ? "Baterai tidak dibatasi" : "Penghemat baterai masih membatasi Setor");
+  const tip = Object.entries(BRAND_TIPS).find(([b]) => h.brand.includes(b))?.[1];
+  $("hBrand").textContent = tip ?? "";
+  $("hBrand").classList.toggle("hidden", !tip);
+}
+
 async function refreshPermission() {
   if (!isNative) return;
   try {
@@ -177,6 +219,7 @@ async function refreshPermission() {
     listening = false;
   }
   renderPermission();
+  renderHealth();
 }
 
 // ---------- tampilan ----------
@@ -260,6 +303,9 @@ function openDetail(id) {
   const sc = syncChip(t);
   $("detailSync").classList.toggle("hidden", !sc);
   if (sc) $("detailSync").textContent = `Web: ${sc[0]}${t.sync?.label ? " · " + t.sync.label : ""}${t.sync?.error ? " · " + t.sync.error : ""}`;
+  const fwd = conn && t.sync?.state !== "sent" && !inBand(t.amount, conn.band);
+  $("detailForward").classList.toggle("hidden", !fwd);
+  if (fwd) $("detailForward").textContent = `Teruskan ke ${conn.business ?? new URL(conn.url).host}`;
   $("detailLabel").value = t.label;
   $("detailNote").value = t.note;
   $("detail").showModal();
@@ -340,6 +386,27 @@ $("resetFilter").addEventListener("click", () => {
 $("exportCsv").addEventListener("click", () => exportCsv(filterTx(txs, currentFilter())));
 $("exportCsv2").addEventListener("click", () => exportCsv(txs));
 $("exportCsv3").addEventListener("click", () => exportCsv(txs));
+$("hPostBtn").addEventListener("click", async () => {
+  try { await SetorNative.requestNotify(); } catch {}
+  renderHealth();
+});
+$("hBatteryBtn").addEventListener("click", () => SetorNative.openBatterySettings().catch(() => toast("Tidak bisa membuka pengaturan baterai.")));
+$("hAccessBtn").addEventListener("click", requestPermission);
+// Nominal di luar jalur tidak dikirim otomatis; pemilik bisa meneruskannya sendiri ke web (mis. bayar bulat tanpa kode unik)
+$("detailForward").addEventListener("click", async () => {
+  const t = txs.find((x) => x.id === editingId);
+  if (!t || !conn) return;
+  const { list } = await syncAll([t], { ...conn, band: null, pairedAt: 0 }, (payload) =>
+    postJson(`${conn.url}/api/payments/qris/notification`, payload, conn.token)
+  );
+  txs = mergeSynced(txs, list);
+  await saveTxs();
+  const sent = txs.find((x) => x.id === t.id);
+  notify(sent);
+  $("detail").close();
+  render();
+  toast(sent?.sync?.state === "sent" ? "Diteruskan ke web" : "Belum terkirim, coba lagi saat online");
+});
 for (const id of ["goConnect", "homeConn"]) $(id).addEventListener("click", () => setTab("settings"));
 $("grant").addEventListener("click", requestPermission);
 $("connPair").addEventListener("click", pair);
@@ -387,7 +454,9 @@ setInterval(() => document.visibilityState === "visible" && syncNow(), 60_000);
   $("previewNote").classList.toggle("hidden", isNative);
   render();
   renderPermission();
+  renderHealth();
   renderConn();
+  if (isNative) SetorNative.requestNotify().catch(() => {}); // Android 13+: izin tampilkan notifikasi
   try {
     await startListener();
   } catch {

@@ -95,6 +95,12 @@
     .notice.warn { background: var(--warnbg); color: var(--warn); }
     .notice.ok { background: var(--tint); color: var(--royal); }
     .notice b { font-size: 14px; }
+    .hrow { display: flex; align-items: center; gap: 12px; }
+    .hrow .dot { width: 30px; height: 30px; flex: none; border-radius: 15px; display: grid; place-items: center; font-size: 14px; font-weight: 800; }
+    .dot.ok { background: var(--tint); color: var(--royal); }
+    .dot.warn { background: var(--warnbg); color: var(--warn); }
+    .hrow .ht { flex: 1; font-size: 14px; }
+    .hrow .btn { min-height: 38px; padding: 0 14px; font-size: 13px; }
     ol.steps { margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
     ol.steps li { margin: 4px 0; }
 
@@ -173,6 +179,14 @@
     <section id="view-settings" role="tabpanel" aria-labelledby="tab-settings" class="hidden">
       <header class="hero"><h1>Pengaturan</h1><p class="hero-label" style="text-align:left">Izin notifikasi, koneksi ke web usaha, dan data.</p></header>
       <div class="card">
+        <h3>Kesehatan HP</h3>
+        <p>Supaya setiap uang masuk tercatat dan dikirim walau Setor tidak dibuka.</p>
+        <div class="hrow" id="hAccess"><span class="dot">·</span><span class="ht">Memeriksa…</span><button id="hAccessBtn" class="btn primary" type="button">Aktifkan</button></div>
+        <div class="hrow" id="hPost"><span class="dot">·</span><span class="ht">Memeriksa…</span><button id="hPostBtn" class="btn primary" type="button">Izinkan</button></div>
+        <div class="hrow" id="hBattery"><span class="dot">·</span><span class="ht">Memeriksa…</span><button id="hBatteryBtn" class="btn primary" type="button">Atur</button></div>
+        <p id="hBrand" class="notice warn hidden"></p>
+      </div>
+      <div class="card">
         <h3>Akses Notifikasi</h3>
         <div id="permStatus" class="notice warn">Memeriksa izin…</div>
         <button id="grant" class="btn primary" type="button">Buka pengaturan izin</button>
@@ -234,6 +248,7 @@
       <div class="raw hidden" id="detailSync"></div>
       <div class="field"><label for="detailLabel">Label</label><input id="detailLabel" class="input" maxlength="60" placeholder="Contoh: K3 · Budi"></div>
       <div class="field"><label for="detailNote">Catatan</label><textarea id="detailNote" class="input" maxlength="300" placeholder="Contoh: bayar lewat adiknya"></textarea></div>
+      <button class="btn primary hidden" type="button" id="detailForward">Teruskan ke web</button>
       <div class="row">
         <button class="btn danger" type="button" id="detailDelete">Hapus</button>
         <button class="btn" value="cancel" formnovalidate>Tutup</button>

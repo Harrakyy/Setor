@@ -94,3 +94,16 @@ test("mergeSynced: notif baru, edit label, dan hapus selama sinkron tetap terjag
   assert.equal(out[0].label, "Pak Budi");
   assert.equal(out[1].sync, undefined);
 });
+
+test("notifCopy: kalimat notifikasi mengikuti status kirim", async () => {
+  const { notifCopy } = await import("./sync.js");
+  const kos = { ...conn, business: "Kos Melati", band: { min: 500, max: 999 } };
+  const t = tx("a", 1, { amount: 799873 });
+  assert.deepEqual(notifCopy(t, null), { title: "Rp799.873 masuk", text: "DANA · tercatat di HP" });
+  assert.equal(notifCopy(t, kos).text, "DANA · mengirim ke Kos Melati…");
+  assert.equal(notifCopy({ ...t, amount: 50000 }, kos).text, "DANA · di luar jalur usaha, disimpan di HP saja");
+  assert.deepEqual(notifCopy({ ...t, sync: { state: "sent", result: "matched", label: "K3 · Budi" } }, kos), { title: "✅ K3 · Budi lunas", text: "Rp799.873 · Kos Melati" });
+  assert.equal(notifCopy({ ...t, sync: { state: "sent", result: "MATCHED", label: "Booking R5Y2" } }, kos).title, "✅ Booking R5Y2 lunas");
+  assert.equal(notifCopy({ ...t, sync: { state: "sent", result: "unmatched", label: null } }, kos).text, "Belum cocok dengan tagihan · cek di Kos Melati");
+  assert.equal(notifCopy({ ...t, sync: { state: "sent", result: "duplicate", label: null } }, kos).text, "Sudah tercatat di Kos Melati");
+});

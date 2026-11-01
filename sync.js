@@ -73,3 +73,27 @@ export function mergeSynced(current, synced) {
     return { ...t, sync: s.sync, label: t.label || s.label };
   });
 }
+
+const rp = (n) => `Rp${n.toLocaleString("id-ID")}`;
+
+/**
+ * Teks notifikasi Setor untuk satu uang masuk, mengikuti status kirimnya.
+ * Versi native (app tertutup) ada di SetorNotifier.java dengan kalimat yang sama.
+ */
+export function notifCopy(t, conn) {
+  const masuk = `${rp(t.amount)} masuk`;
+  const business = conn?.business ?? "web usaha";
+  const s = t.sync;
+  if (!conn) return { title: masuk, text: "DANA · tercatat di HP" };
+  if (s?.state === "sent") {
+    const already = s.result === "duplicate" || s.result === "ALREADY_PAID";
+    if (/^matched$/i.test(s.result ?? "") || (already && s.label)) {
+      return { title: `✅ ${s.label ? `${s.label} lunas` : "Lunas"}`, text: `${rp(t.amount)} · ${business}` };
+    }
+    if (already) return { title: masuk, text: `Sudah tercatat di ${business}` };
+    return { title: masuk, text: `Belum cocok dengan tagihan · cek di ${business}` };
+  }
+  if (s?.state === "failed") return { title: masuk, text: "Gagal dikirim · buka Setor" };
+  if (!inBand(t.amount, conn.band)) return { title: masuk, text: "DANA · di luar jalur usaha, disimpan di HP saja" };
+  return { title: masuk, text: `DANA · mengirim ke ${business}…` };
+}
