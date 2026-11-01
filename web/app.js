@@ -16,6 +16,8 @@ const KEY_CONN = "setorpantau.conn"; // { url, token, deviceName, pairedAt }
 const DEFAULT_PKGS = ["id.dana"];
 
 const $ = (id) => document.getElementById(id);
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const EASE = "cubic-bezier(.2, .8, .2, 1)";
 const rupiah = (n) => "Rp " + n.toLocaleString("id-ID");
 const fmtWhen = (ms) =>
   new Date(ms).toLocaleString("id-ID", { timeZone: "Asia/Jakarta", day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) + " WIB";
@@ -223,8 +225,32 @@ async function refreshPermission() {
 }
 
 // ---------- tampilan ----------
+// Angka total "berjalan" dari nilai lama ke nilai baru (0 saat pertama dibuka); pembaca layar langsung dapat nilai akhir
+function countTo(el, value) {
+  const from = Number(el.dataset.v ?? 0);
+  el.dataset.v = value;
+  el.setAttribute("aria-label", rupiah(value));
+  cancelAnimationFrame(el._raf);
+  if (reduceMotion || from === value) {
+    el.textContent = rupiah(value);
+    return;
+  }
+  const start = performance.now();
+  const step = (now) => {
+    const p = Math.min(1, (now - start) / 700);
+    el.textContent = rupiah(Math.round(from + (value - from) * (1 - (1 - p) ** 3)));
+    if (p < 1) el._raf = requestAnimationFrame(step);
+  };
+  el._raf = requestAnimationFrame(step);
+}
+
+// Baris baru masuk dari atas & berpendar; saat pertama dibuka semua baris naik berurutan; chip status yang berubah "pop"
+const seen = new Set();
+const lastChip = new Map();
+let firstPaint = true;
+
 // Baris: avatar (awal label), label + waktu, nominal + status kirim
-function txRow(t) {
+function txRow(t, i = 0) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "tx";
@@ -235,23 +261,31 @@ function txRow(t) {
   btn.querySelector(".when").textContent = `${fmtShort(t.time)} · DANA${t.note ? " · " + t.note : ""}`;
   btn.querySelector(".amt").textContent = rupiah(t.amount);
   const sc = syncChip(t);
-  if (sc) btn.querySelector(".right").append(Object.assign(document.createElement("span"), { className: `chip ${sc[1]}`, textContent: sc[0] }));
+  if (sc) {
+    const chip = Object.assign(document.createElement("span"), { className: `chip ${sc[1]}`, textContent: sc[0] });
+    if (!firstPaint && lastChip.has(t.id) && lastChip.get(t.id) !== sc[0]) chip.classList.add("pop");
+    btn.querySelector(".right").append(chip);
+  }
+  if (firstPaint) {
+    btn.classList.add("enter");
+    btn.style.animationDelay = `${Math.min(i, 8) * 35}ms`;
+  } else if (!seen.has(t.id)) btn.classList.add("fresh");
   btn.setAttribute("aria-label", `${rupiah(t.amount)}, ${fmtWhen(t.time)}${t.label ? ", " + t.label : ""}${t.note ? ", " + t.note : ""}`);
   btn.addEventListener("click", () => openDetail(t.id));
   return btn;
 }
 
 function fillList(el, list, emptyText) {
-  el.replaceChildren(...(list.length ? list.map(txRow) : [Object.assign(document.createElement("div"), { className: "empty", textContent: emptyText })]));
+  el.replaceChildren(...(list.length ? list.map((t, i) => txRow(t, i)) : [Object.assign(document.createElement("div"), { className: "empty", textContent: emptyText })]));
 }
 
 const currentFilter = () => ({ q: $("q").value, from: $("from").value, to: $("to").value });
 
 function render() {
   const t = totals(txs);
-  $("todaySum").textContent = rupiah(t.today.sum);
+  countTo($("todaySum"), t.today.sum);
   $("todayCount").textContent = `${t.today.count} transaksi`;
-  $("monthSum").textContent = rupiah(t.month.sum);
+  countTo($("monthSum"), t.month.sum);
   $("monthLabel").textContent = `Uang masuk ${new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta", month: "long" })}`;
   $("monthCount").textContent = `${t.month.count} transaksi`;
   fillList($("recentList"), txs.slice(0, 5), "Belum ada pembayaran masuk tercatat.");
@@ -259,7 +293,13 @@ function render() {
   const filtered = filterTx(txs, currentFilter());
   fillList($("txList"), filtered, txs.length ? "Tidak ada transaksi yang cocok." : "Belum ada pembayaran masuk tercatat.");
   $("filterCount").textContent = `${filtered.length} transaksi`;
-  $("filterSum").textContent = rupiah(filtered.reduce((s, x) => s + x.amount, 0));
+  countTo($("filterSum"), filtered.reduce((s, x) => s + x.amount, 0));
+  for (const x of txs) {
+    seen.add(x.id);
+    const sc = syncChip(x);
+    if (sc) lastChip.set(x.id, sc[0]);
+  }
+  firstPaint = false;
 }
 
 function renderPermission() {
@@ -289,10 +329,17 @@ function setTab(name) {
     tab.tabIndex = on ? 0 : -1;
   }
   for (const v of ["home", "tx", "settings"]) $(`view-${v}`).classList.toggle("hidden", v !== name);
+  if (!reduceMotion) $(`view-${name}`).animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 240, easing: EASE });
   try { localStorage.setItem("setorpantau.tab", name); } catch {}
 }
 
 // ---------- detail ----------
+function closeSheet() {
+  const d = $("detail");
+  if (reduceMotion || !d.open) return d.close();
+  d.animate([{ transform: "none" }, { transform: "translateY(100%)" }], { duration: 220, easing: "ease-in" }).finished.then(() => d.close());
+}
+
 function openDetail(id) {
   const t = txs.find((x) => x.id === id);
   if (!t) return;
@@ -314,7 +361,7 @@ function openDetail(id) {
 $("detailSave").addEventListener("click", async () => {
   txs = updateTx(txs, editingId, { label: $("detailLabel").value, note: $("detailNote").value });
   await saveTxs();
-  $("detail").close();
+  closeSheet();
   render();
   toast("Catatan disimpan");
 });
@@ -323,7 +370,7 @@ $("detailDelete").addEventListener("click", async () => {
   if (!confirm("Hapus catatan transaksi ini? Uang di DANA tidak terpengaruh.")) return;
   txs = deleteTx(txs, editingId);
   await saveTxs();
-  $("detail").close();
+  closeSheet();
   render();
   toast("Transaksi dihapus dari catatan");
 });
@@ -403,7 +450,7 @@ $("detailForward").addEventListener("click", async () => {
   await saveTxs();
   const sent = txs.find((x) => x.id === t.id);
   notify(sent);
-  $("detail").close();
+  closeSheet();
   render();
   toast(sent?.sync?.state === "sent" ? "Diteruskan ke web" : "Belum terkirim, coba lagi saat online");
 });

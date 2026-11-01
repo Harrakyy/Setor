@@ -11,6 +11,7 @@
     :root {
       --navy: #0a1a47; --royal: #14389e; --sky: #3d78f0; --ink: #0f172a; --mist: #f1f4f9; --tint: #e6edfd;
       --muted: #64748b; --line: #eef2f7; --card: #ffffff; --warn: #9a4a06; --warnbg: #fef3e2; --danger: #b91c1c;
+      --ease: cubic-bezier(.2, .8, .2, 1);
       --hero: linear-gradient(180deg, #0a1a47 0%, #14389e 62%, #3d78f0 100%);
     }
     * { box-sizing: border-box; }
@@ -118,6 +119,25 @@
     .sheet::before { content: ""; align-self: center; width: 44px; height: 5px; border-radius: 3px; background: #cbd5e1; }
     .sheet .big { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
     .sheet .raw { font-size: 13px; color: #334155; background: var(--mist); border-radius: 16px; padding: 10px 12px; }
+    /* ---------- Gerak: cepat & halus, hanya transform/opacity supaya mulus di HP murah ---------- */
+    .hero-amt, .amt, .summary b, .hero-pill b { font-variant-numeric: tabular-nums; }
+    .btn, .pill, .tab, .round, .tx, .glass { transition: transform .12s var(--ease), background-color .2s var(--ease), color .2s var(--ease); }
+    .btn:active, .pill:active, .tab:active, .round:active, .glass:active { transform: scale(.96); }
+    .tx:active { transform: scale(.985); }
+    .tx.enter { animation: rise .38s var(--ease) both; }
+    .tx.fresh { animation: fresh 1.3s var(--ease) both; }
+    .chip.pop { animation: pop .38s var(--ease) both; }
+    dialog[open] { animation: sheetUp .32s var(--ease); }
+    dialog[open]::backdrop { animation: fadeIn .25s ease; }
+    .toast { animation: toastIn .26s var(--ease); }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+    @keyframes fresh { 0% { opacity: 0; transform: translateY(-14px); background: var(--tint); } 35% { opacity: 1; transform: none; background: var(--tint); } 100% { background: transparent; } }
+    @keyframes pop { 0% { opacity: 0; transform: scale(.6); } 70% { transform: scale(1.12); } 100% { transform: scale(1); } }
+    @keyframes sheetUp { from { transform: translateY(100%); } }
+    @keyframes fadeIn { from { opacity: 0; } }
+    @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 12px); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after, dialog::backdrop { animation: none !important; transition: none !important; } }
+
     .toast { position: fixed; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; z-index: 50; max-width: calc(100% - 32px); }
   </style>
 </head>

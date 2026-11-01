@@ -42,7 +42,7 @@ const evaluate = (expression) => new Promise((resolve) => {
 });
 const state = () => evaluate(`(() => ({
   rows: [...document.querySelectorAll("#recentList .tx .amt")].map((e) => e.textContent),
-  today: document.getElementById("todaySum").textContent,
+  today: document.getElementById("todaySum").getAttribute("aria-label") ?? document.getElementById("todaySum").textContent,
   count: document.getElementById("todayCount").textContent,
   perm: document.getElementById("permStatus").textContent,
 }))()`);
