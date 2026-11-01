@@ -25,7 +25,9 @@ Contoh notifikasi yang dicatat:
    - Atau buka halaman rilis **https://github.com/Harrakyy/Setor/releases/tag/latest** lalu ketuk **Setor-latest-debug.apk**.
    - APK ini dibuat otomatis oleh GitHub Actions setiap ada push ke `main` (tab **Actions → Android APK**), jadi selalu versi terbaru.
    - Link 404? Repo masih privat: ubah di **Settings → General → Danger Zone → Change visibility → Public**, atau unduh sambil login GitHub.
-2. Buka file APK-nya, izinkan **"Instal aplikasi tidak dikenal"**, lalu **Instal**. Kalau sudah ada versi lama dengan tanda tangan berbeda, hapus dulu versi lamanya.
+2. Buka file APK-nya, izinkan **"Instal aplikasi tidak dikenal"**, lalu **Instal**.
+   - Semua APK dari CI sekarang memakai tanda tangan yang sama, jadi versi baru langsung **memperbarui** yang lama.
+   - Kalau muncul **"Aplikasi tidak terinstal"**, Setor di HP masih bertanda tangan lama: ekspor CSV dulu (Pengaturan → Data), hapus Setor, lalu pasang APK ini. Cukup sekali.
 3. Buka Setor → **Pengaturan → Buka pengaturan izin** → aktifkan **Setor** di Akses Notifikasi.
 4. Matikan penghemat baterai: **Setelan → Aplikasi → Setor → Baterai → Tidak dibatasi**. Tanpa ini, Android bisa menghentikan pembaca notifikasi diam-diam.
 

@@ -28,6 +28,15 @@ jobs:
       - run: npm run build
       - run: npx cap sync android
 
+      # Gradle membuat ~/.android/debug.keystore acak di tiap runner baru; tanpa cache ini setiap APK
+      # bertanda tangan beda dan Android menolak update ("Aplikasi tidak terinstal").
+      # shortcut: cache hilang kalau 7 hari tanpa build, ganti ke secret keystore sebelum rilis ke pengguna
+      - name: Pakai kunci debug yang sama setiap build
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: setor-debug-keystore-v1
+
       - name: Versi dari tag (v1.2.3 → 1.2.3)
         run: |
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then echo "VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"; else echo "VERSION_NAME=0.0.0-dev.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"; fi
