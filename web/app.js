@@ -103,8 +103,9 @@ async function pair() {
   } catch {
     return toast("Alamat web tidak valid. Contoh: https://kosinyuk.id");
   }
-  const code = $("connCode").value.trim().toUpperCase();
-  if (code.length < 8) return toast("Isi kode pairing 8 karakter dari halaman admin.");
+  // Buang tanda hubung/spasi: Kosinyuk menampilkan "K7Q2-M9XA", Atmosphere menerima tepat 8 karakter
+  const code = $("connCode").value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (code.length < 8) return toast("Isi kode pairing 8 karakter dari web usaha (Atmosphere: Admin → Pengaturan → Buat kode pairing).");
   $("connPair").disabled = true;
   try {
     const res = await postJson(`${url}/api/devices/pair`, { code, name: $("connName").value.trim() || "HP Setor" });
